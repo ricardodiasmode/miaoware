@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 
 set(CMAKE_CXX_STANDARD 17)
-set(PROJECT_NAME "tp3-super-mario-bros")
+set(PROJECT_NAME "miaoware")
 project(${PROJECT_NAME})
 
 set(SDL2_ROOT "C:/Program Files/SDL2" CACHE PATH "Root path for SDL2 and SDL2_image")
