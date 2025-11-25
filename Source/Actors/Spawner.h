@@ -9,7 +9,7 @@
 class Spawner : public Actor
 {
 public:
-    explicit Spawner(Game* game, float spawnDistance);
+    explicit Spawner(Game* game, const std::string& uniqueName, float spawnDistance);
 
     void OnUpdate(float deltaTime) override;
 private:

@@ -7,8 +7,8 @@
 #include "../Game.h"
 #include "../Components/Drawing/TextureComponent.h"
 
-Background::Background(Game *game, const std::string &texturePath)
-        :Actor(game)
+Background::Background(Game *game, const std::string& uniqueName, const std::string &texturePath)
+        :Actor(game, uniqueName)
 {
         new TextureComponent(this,
                 texturePath,

@@ -9,7 +9,7 @@
 class Mushroom : public Actor
 {
 public:
-    explicit Mushroom(Game* game, float forwardSpeed = 100.0f);
+    explicit Mushroom(Game* game, const std::string& uniqueName, float forwardSpeed = 100.0f);
 
     void OnUpdate(float deltaTime) override;
     void OnHorizontalCollision(float minOverlap, AABBColliderComponent* other) override;

@@ -7,8 +7,8 @@
 #include "../Components/Drawing/AnimatorComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Block::Block(Game* game, const std::string &texturePath, const bool isStatic)
-        :Actor(game)
+Block::Block(Game* game, const std::string& uniqueName, const std::string &texturePath, const bool isStatic)
+        :Actor(game, uniqueName)
 {
         new AnimatorComponent(this,
                 texturePath,

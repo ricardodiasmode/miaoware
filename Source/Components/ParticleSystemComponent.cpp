@@ -8,8 +8,8 @@
 #include "Physics/RigidBodyComponent.h"
 #include "Drawing/RectComponent.h"
 
-Particle::Particle(class Game* game, int width, int height)
-    : Actor(game)
+Particle::Particle(class Game* game, const std::string& uniqueName, int width, int height)
+    : Actor(game, uniqueName)
     , mDrawComponent(nullptr)
     , mRigidBodyComponent(nullptr)
     , mColliderComponent(nullptr)
@@ -64,7 +64,7 @@ ParticleSystemComponent::ParticleSystemComponent(class Actor* owner, int particl
     // Create a pool of particles
     for (int i = 0; i < poolSize; i++)
     {
-        auto* p = new Particle(owner->GetGame(), particleW, particleH);
+        auto* p = new Particle(owner->GetGame(), "Particle", particleW, particleH);
         mParticles.push_back(p);
     }
 }

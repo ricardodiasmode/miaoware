@@ -5,10 +5,12 @@
 #pragma once
 #include "Actor.h"
 
-class Mario : public Actor
+class Cat : public Actor
 {
 public:
-    explicit Mario(Game* game, float forwardSpeed = 1500.0f, float jumpSpeed = -750.0f);
+    explicit Cat(Game* game, const std::string& uniqueName, float forwardSpeed = 1500.0f, float jumpSpeed = -750.0f);
+
+    void Jump();
 
     void OnProcessInput(const Uint8* keyState) override;
     void OnUpdate(float deltaTime) override;

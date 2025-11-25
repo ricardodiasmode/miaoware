@@ -4,14 +4,14 @@
 
 #include "Mushroom.h"
 
-#include "Mario.h"
+#include "Cat.h"
 #include "../Game.h"
 #include "../Components/Drawing/TextureComponent.h"
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Mushroom::Mushroom(Game* game, float forwardSpeed)
-        : Actor(game)
+Mushroom::Mushroom(Game* game, const std::string& uniqueName, float forwardSpeed)
+        : Actor(game, uniqueName)
         , mIsDying(false)
         , mForwardSpeed(forwardSpeed)
 {
@@ -57,6 +57,6 @@ void Mushroom::OnVerticalCollision(float minOverlap, AABBColliderComponent *othe
     if (other->GetLayer() == ColliderLayer::Player)
     {
         SetState(ActorState::Destroy);
-        dynamic_cast<Mario*>(other->GetOwner())->EatMushroomEffect();
+        dynamic_cast<Cat*>(other->GetOwner())->EatMushroomEffect();
     }
 }

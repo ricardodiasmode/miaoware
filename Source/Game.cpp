@@ -21,10 +21,11 @@
 #include "Actors/MovingBlock.h"
 #include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
-#include "Actors/Mario.h"
+#include "Actors/Cat.h"
 #include "Actors/Mushroom.h"
 #include "Actors/SpawnBlock.h"
 #include "Components/Drawing/AnimatorComponent.h"
+#include "Utils/ObjectManager.h"
 
 Game::Game()
         :mWindow(nullptr)
@@ -34,7 +35,7 @@ Game::Game()
         ,mIsDebugging(false)
         ,mUpdatingActors(false)
         ,mCameraPos(0.f, 0.f)
-        ,mMario(nullptr)
+        ,mCat(nullptr)
         ,mLevelData(nullptr)
 {
 
@@ -69,6 +70,8 @@ bool Game::Initialize()
     InitializeActors();
 
     mTicksCount = SDL_GetTicks();
+
+    mObjManager = new ObjectManager(this);
 
     return true;
 }
@@ -135,10 +138,11 @@ int **Game::LoadLevel(const std::string& fileName, int width, int height)
 
 void Game::BuildLevel(int** levelData, int width, int height)
 {
-    auto* bg = new Background(this, "../Assets/Sprites/Background.png");
+    auto* bg = new Background(this, "Background", "../Assets/Sprites/Background.png");
     bg->SetPosition(Vector2(3408, 210));
 
     // Percorre a matriz de tiles
+    int objNum = 0;
     for (int row = 0; row < height; row++)
     {
         for (int col = 0; col < width; col++)
@@ -154,7 +158,7 @@ void Game::BuildLevel(int** levelData, int width, int height)
             {
                 case 0:
                     // Chão
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockA.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockA.png");
                     break;
                 case 1:
                 {
@@ -168,57 +172,55 @@ void Game::BuildLevel(int** levelData, int width, int height)
                     if (std::find(spawnableBlocks.begin(), spawnableBlocks.end(), currentPos) != spawnableBlocks.end())
                     {
                         NewBlock = SpawnBlock::create<Mushroom>(
-                        this, "../Assets/Sprites/Blocks/BlockC.png",
-                        this, 100.f
-                        );
+                        this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", 100.f);
                     } else
                     {
                         NewBlock = new MovingBlock(
-                        this, "../Assets/Sprites/Blocks/BlockC.png"
+                        this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png"
                         );
                     }
                     break;
                 }
                 case 4:
                     // Brick
-                    NewBlock = new MovingBlock(this, "../Assets/Sprites/Blocks/BlockB.png");
+                    NewBlock = new MovingBlock(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockB.png");
                     break;
                 case 8:
                     // Chão especial
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockD.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
                     break;
                 case 10:
                 {
-                    auto* spawner = new Spawner(this, SPAWN_DISTANCE);
+                    auto* spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
                     const Vector2 pos(posX, posY);
                     spawner->SetPosition(pos);
                     break;
                 }
                 case 12:
                     // Cano verde cima direita
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockG.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockG.png");
                     break;
                 case 2:
                     // Cano verde cima esquerda
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockF.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockF.png");
                     break;
                 case 9:
                     // cano verde baixo esquerda
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockH.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockH.png");
                     break;
                 case 6:
                     // Cano verde baixo direita
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockI.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockI.png");
                     break;
                 case 7:
                     // Cano verde topo direito
-                    NewBlock = new Block(this, "../Assets/Sprites/Blocks/BlockD.png");
+                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
                     break;
                 case 16:
                 {
-                    mMario = new Mario(this);
+                    mCat = new Cat(this, "Player"+std::to_string(objNum));
                     const Vector2 pos(posX, posY);
-                    mMario->SetPosition(pos);
+                    mCat->SetPosition(pos);
                 }
                 default:
                     break;
@@ -228,6 +230,7 @@ void Game::BuildLevel(int** levelData, int width, int height)
                 const Vector2 pos(posX, posY);
                 NewBlock->SetPosition(pos);
             }
+            objNum++;
         }
     }
 }
@@ -320,9 +323,9 @@ void Game::UpdateActors(float deltaTime)
 
 void Game::UpdateCamera()
 {
-    if (!mMario)
+    if (!mCat)
         return;
-    float desiredXLoc = mMario->GetPosition().x - WINDOW_WIDTH/2.f;
+    float desiredXLoc = mCat->GetPosition().x - WINDOW_WIDTH/2.f;
 
     if (desiredXLoc < 0.f)
         desiredXLoc = 0.f;
@@ -430,6 +433,9 @@ void Game::Shutdown()
     mRenderer->Shutdown();
     delete mRenderer;
     mRenderer = nullptr;
+
+    delete mObjManager;
+    mObjManager = nullptr;
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();

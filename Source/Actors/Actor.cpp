@@ -11,12 +11,13 @@
 #include "../Components/Component.h"
 #include <algorithm>
 
-Actor::Actor(Game* game)
+Actor::Actor(Game* game, const std::string& uniqueName)
         : mState(ActorState::Active)
         , mPosition(Vector2::Zero)
         , mScale(Vector2(1.0f, 1.0f))
         , mRotation(0.0f)
         , mGame(game)
+        , mActorName(uniqueName)
 {
     mGame->AddActor(this);
 }

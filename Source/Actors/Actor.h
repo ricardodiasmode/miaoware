@@ -23,7 +23,7 @@ enum class ActorState
 class Actor
 {
 public:
-    Actor(class Game* game);
+    Actor(class Game* game, const std::string& uniqueName);
     virtual ~Actor();
 
     // Update function called from Game (not overridable)
@@ -79,6 +79,10 @@ public:
     virtual void OnVerticalCollision(float minOverlap, AABBColliderComponent* other);
     virtual void Kill();
 
+    const std::string& GetActorName() { return mActorName; }
+
+    bool mIsManageable = false;
+
 protected:
     class Game* mGame;
 
@@ -100,6 +104,8 @@ protected:
 
     // Game specific
     bool mIsOnGround;
+
+    std::string mActorName;
 
 private:
     friend class Component;

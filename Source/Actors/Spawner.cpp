@@ -4,12 +4,12 @@
 
 #include "Spawner.h"
 #include "../Game.h"
-#include "Mario.h"
+#include "Cat.h"
 #include "Goomba.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Spawner::Spawner(Game* game, float spawnDistance)
-        :Actor(game)
+Spawner::Spawner(Game* game, const std::string& uniqueName, float spawnDistance)
+        :Actor(game, uniqueName)
         ,mSpawnDistance(spawnDistance)
 {
 
@@ -19,7 +19,7 @@ void Spawner::OnUpdate(float deltaTime)
 {
         if (mGame->GetPlayer()->GetPosition().x < mSpawnDistance)
         {
-                auto* goomba = new Goomba(mGame);
+                auto* goomba = new Goomba(mGame, "Goomba");
 
                 goomba->SetPosition(GetPosition());
 

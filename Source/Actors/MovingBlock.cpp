@@ -16,8 +16,8 @@ void MovingBlock::StartMovementInterp()
         mInitialPosition = GetPosition();
 }
 
-MovingBlock::MovingBlock(Game* game, const std::string &texturePath)
-        :Block(game, texturePath, false)
+MovingBlock::MovingBlock(Game* game, const std::string& uniqueName, const std::string &texturePath)
+        :Block(game, uniqueName, texturePath, false)
 {
 }
 

@@ -4,14 +4,14 @@
 
 #include "Goomba.h"
 
-#include "Mario.h"
+#include "Cat.h"
 #include "../Game.h"
 #include "../Components/Drawing/AnimatorComponent.h"
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Goomba::Goomba(Game* game, float forwardSpeed, float deathTime)
-        : Actor(game)
+Goomba::Goomba(Game* game, const std::string& uniqueName, float forwardSpeed, float deathTime)
+        : Actor(game, uniqueName)
         , mDyingTimer(deathTime)
         , mIsDying(false)
         , mForwardSpeed(forwardSpeed)
@@ -66,7 +66,7 @@ void Goomba::OnHorizontalCollision(const float minOverlap, AABBColliderComponent
 {
     if (other->GetLayer() == ColliderLayer::Player)
     {
-        dynamic_cast<Mario*>(other->GetOwner())->EnemyHit(mColliderComponent);
+        dynamic_cast<Cat*>(other->GetOwner())->EnemyHit(mColliderComponent);
         return;
     }
 

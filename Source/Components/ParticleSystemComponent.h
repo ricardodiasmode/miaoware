@@ -11,7 +11,7 @@
 class Particle : public Actor
 {
 public:
-    Particle(class Game* game, int width, int height);
+    Particle(class Game* game, const std::string& uniqueName, int width, int height);
 
     void OnUpdate(float deltaTime) override;
 

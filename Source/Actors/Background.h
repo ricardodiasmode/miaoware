@@ -10,5 +10,5 @@
 class Background : public Actor
 {
 public:
-    explicit Background(Game* game, const std::string &texturePath);
+    explicit Background(Game* game, const std::string& uniqueName, const std::string &texturePath);
 };

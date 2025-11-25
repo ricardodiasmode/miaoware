@@ -5,10 +5,10 @@
 #include "AABBColliderComponent.h"
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
-#include "../../Actors/Mario.h"
+#include "../../Actors/Cat.h"
 
 AABBColliderComponent::AABBColliderComponent(class Actor* owner, int dx, int dy, int w, int h,
-        ColliderLayer layer, bool isStatic, int updateOrder)
+                                             ColliderLayer layer, bool isStatic, int updateOrder)
         :Component(owner, updateOrder)
         ,mOffset(Vector2((float)dx, (float)dy))
         ,mIsStatic(isStatic)

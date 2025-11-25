@@ -23,7 +23,7 @@ protected:
     virtual void OnFinishMovement() {}
 
 public:
-    explicit MovingBlock(Game* game, const std::string &texturePath);
+    explicit MovingBlock(Game* game, const std::string& uniqueName, const std::string &texturePath);
 
     void OnUpdate(float deltaTime) override;
 

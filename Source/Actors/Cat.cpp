@@ -2,7 +2,7 @@
 // Created by Lucas N. Ferreira on 03/08/23.
 //
 
-#include "Mario.h"
+#include "Cat.h"
 
 #include "MovingBlock.h"
 #include "../Game.h"
@@ -11,8 +11,8 @@
 #include "../Components/Physics/AABBColliderComponent.h"
 #include "../Components/ParticleSystemComponent.h"
 
-Mario::Mario(Game* game, const float forwardSpeed, const float jumpSpeed)
-        : Actor(game)
+Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, const float jumpSpeed)
+        : Actor(game, uniqueName)
         , mIsRunning(false)
         , mIsDead(false)
         , mForwardSpeed(forwardSpeed)
@@ -53,9 +53,18 @@ Mario::Mario(Game* game, const float forwardSpeed, const float jumpSpeed)
             Game::TILE_SIZE,
             Game::TILE_SIZE,
             ColliderLayer::Player);
+
+    mIsManageable = true;
 }
 
-void Mario::OnProcessInput(const uint8_t* state)
+void Cat::Jump()
+{
+    Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
+    newVelocity.y = mJumpSpeed;
+    mRigidBodyComponent->SetVelocity(newVelocity);
+}
+
+void Cat::OnProcessInput(const uint8_t* state)
 {
     if (state[SDL_SCANCODE_A])
     {
@@ -80,13 +89,11 @@ void Mario::OnProcessInput(const uint8_t* state)
 
     if (state[SDL_SCANCODE_SPACE] && mIsOnGround)
     {
-        Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
-        newVelocity.y = mJumpSpeed;
-        mRigidBodyComponent->SetVelocity(newVelocity);
+        Jump();
     }
 }
 
-void Mario::OnUpdate(float deltaTime)
+void Cat::OnUpdate(float deltaTime)
 {
     if (GetPosition().x < 0.f)
     {
@@ -101,11 +108,10 @@ void Mario::OnUpdate(float deltaTime)
     if (mRigidBodyComponent->GetVelocity().y != 0)
         mIsOnGround = false;
 
-
     ManageAnimations();
 }
 
-void Mario::ManageAnimations()
+void Cat::ManageAnimations()
 {
     if (mIsDead)
         return;
@@ -121,7 +127,7 @@ void Mario::ManageAnimations()
         (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("jump");
 }
 
-void Mario::Kill()
+void Cat::Kill()
 {
     DecreaseSize();
 
@@ -131,7 +137,7 @@ void Mario::Kill()
     mColliderComponent->SetEnabled(false);
 }
 
-void Mario::EatMushroomEffect()
+void Cat::EatMushroomEffect()
 {
     mIsBig = true;
     mDrawComponent->SetEnabled(false);
@@ -142,7 +148,7 @@ void Mario::EatMushroomEffect()
     mColliderComponent->Resize(32, 64, newOffset);
 }
 
-void Mario::DecreaseSize()
+void Cat::DecreaseSize()
 {
     if (!mIsBig)
         return;
@@ -157,7 +163,7 @@ void Mario::DecreaseSize()
     mColliderComponent->Resize(32, 32, newOffset);
 }
 
-void Mario::EnemyHit(AABBColliderComponent *other)
+void Cat::EnemyHit(AABBColliderComponent *other)
 {
     if (mIsBig)
     {
@@ -171,7 +177,7 @@ void Mario::EnemyHit(AABBColliderComponent *other)
     }
 }
 
-void Mario::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
+void Cat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
     if (other->GetLayer() == ColliderLayer::Enemy)
     {
@@ -183,7 +189,7 @@ void Mario::OnHorizontalCollision(const float minOverlap, AABBColliderComponent*
     }
 }
 
-void Mario::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
+void Cat::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
 {
     if (other->GetLayer() == ColliderLayer::Enemy)
     {

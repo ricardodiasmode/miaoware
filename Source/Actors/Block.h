@@ -9,5 +9,5 @@
 class Block : public Actor
 {
 public:
-    explicit Block(Game* game, const std::string &texturePath, bool isStatic = true);
+    explicit Block(Game* game, const std::string& uniqueName, const std::string &texturePath, bool isStatic = true);
 };
