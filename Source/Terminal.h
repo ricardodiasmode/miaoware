@@ -19,19 +19,15 @@ public:
 
   ~Terminal();
 
-  // liga/desliga o terminal (toggle)
   void Toggle();
   void SetActive(bool active);
   bool IsActive() const { return mActive; }
   void AddLine(const std::string& line);
 
-  // processa eventos SDL (use antes de encaminhar eventos ao jogo)
   void ProcessEvent(const SDL_Event& ev);
 
-  // desenha por cima (chamar depois de tudo em GenerateOutput)
   void Draw();
 
-  // retorna e limpa o último comando enviado (ENTER)
   std::string ConsumeCommand();
 
 private:
@@ -40,17 +36,17 @@ private:
   void SubmitLine();
 
   Renderer* mRenderer;
-  Font* mFont;                 // ponteiro para Font carregada
+  Font* mFont;
   std::string mFontPath;
   int mPointSize;
   int mMaxLines;
 
   bool mActive;
-  std::deque<std::string> mLines; // histórico visível (últimas mMaxLines - 1 são history)
-  std::string mBuffer;            // linha atual sendo digitada
-  std::string mLastCommand;       // comando pronto após ENTER
+  std::deque<std::string> mLines;
+  std::string mBuffer;
+  std::string mLastCommand;
 
-  // cursor
-  float mCursorBlink;    // contador para piscar cursor
+
+  float mCursorBlink;
   bool mCursorOn;
 };

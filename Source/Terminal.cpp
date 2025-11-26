@@ -116,14 +116,14 @@ void Terminal::Backspace()
 {
     if (mBuffer.empty())
         return;
-    // remove último byte UTF-8 corretamente: simplificação — remove 1 byte até encontrar início (bom o suficiente para ascii)
-    // Para suporte UTF-8 robusto, você pode usar uma lib. Aqui assumimos ascii/utf8 simples.
+
+
     mBuffer.pop_back();
 }
 
 void Terminal::SubmitLine()
 {
-    // adicionar linha ao histórico
+
     if (!mBuffer.empty())
     {
         mLines.push_back(mBuffer);
@@ -148,33 +148,33 @@ void Terminal::Draw()
     if (!mFont)
         return;
 
-    // cálculo real baseado no level (posX,posY estão no centro do terminal)
+
     const float levelHeightPx = ((Game::LEVEL_HEIGHT)*Game::TILE_SIZE);
 
-    const float posX = Game::WINDOW_WIDTH / 2; // seu terminal já usa isso como centro
+    const float posX = Game::WINDOW_WIDTH / 2;
     const float width = static_cast<float>(Game::WINDOW_WIDTH);
     const float height = static_cast<float>(Game::WINDOW_HEIGHT) - levelHeightPx + Game::LEVEL_HEIGHT;
-    const float posY = levelHeightPx + (height / 2.3); // mantém sua posição atual do terminal
+    const float posY = levelHeightPx + (height / 2.3);
 
     const float lineHeight = static_cast<float>(mPointSize + 4);
     const float padX = 8.0f;
     const float padY = 6.0f;
 
-    // desenha fundo (centro, size)
+
     mRenderer->DrawRect(Vector2(posX, posY), Vector2(width, height), 0.0f,
                         Vector3(0.03f, 0.03f, 0.03f), Vector2::Zero, RendererMode::TRIANGLES);
 
-    // calcular canto superior-esquerdo (pois posX,posY são centro do terminal)
+
     float left = posX - width * 0.5f;
-    float top = posY - height * 0.5f; // **top** (superior)
+    float top = posY - height * 0.5f;
 
-    // início do desenho do texto: canto superior esquerdo + padding
-    // parâmetros já definidos antes:
-    float drawX = left + padX;          // canto esquerdo + padding
-    float drawY = top + padY;           // canto superior + padding
-    float maxPixels = width - 2 * padX; // área útil horizontal
 
-    // --- desenhar linhas do histórico (cada linha) ---
+
+    float drawX = left + padX;
+    float drawY = top + padY;
+    float maxPixels = width - 2 * padX;
+
+
     for (const auto &ln : mLines)
     {
         Texture *tex = mFont->RenderText(ln, Vector3(1, 1, 1), mPointSize);
@@ -186,17 +186,17 @@ void Terminal::Draw()
 
         if (texW <= maxPixels)
         {
-            // cabe totalmente: desenhar normalmente
-            Vector2 centerPos(drawX + texW * 0.5f, drawY + texH * 0.5f); // converter top-left->center
+
+            Vector2 centerPos(drawX + texW * 0.5f, drawY + texH * 0.5f);
             mRenderer->DrawTexture(centerPos, Vector2(texW, texH), 0.0f,
                                    Vector3(1, 1, 1), tex, Vector4(0, 0, 1, 1),
                                    Vector2::Zero, false, 1.0f);
         }
         else
         {
-            // maior que área: mostrar APENAS A PARTE DIREITA (últimos maxPixels)
-            float u0 = (texW - maxPixels) / texW; // proporção inicial em UV para mostrar só fim
-            Vector4 uv(u0, 0.0f, 1.0f, 1.0f);     // (u0,v0,u1,v1)
+
+            float u0 = (texW - maxPixels) / texW;
+            Vector4 uv(u0, 0.0f, 1.0f, 1.0f);
             Vector2 size(maxPixels, texH);
             Vector2 centerPos(drawX + maxPixels * 0.5f, drawY + texH * 0.5f);
             mRenderer->DrawTexture(centerPos, size, 0.0f,
@@ -211,7 +211,7 @@ void Terminal::Draw()
             break;
     }
 
-    // --- desenhar prompt (mesma lógica, mas importante pro cursor) ---
+
     std::string prompt = "mioware@user:~$ " + mBuffer + (mCursorOn ? "_" : " ");
     Texture *ptex = mFont->RenderText(prompt, Vector3(1, 1, 1), mPointSize);
     if (ptex)
@@ -228,7 +228,7 @@ void Terminal::Draw()
         }
         else
         {
-            // cortar e mostrar a parte DIREITA (o final da string) para que o cursor fique visível
+
             float u0 = (texW - maxPixels) / texW;
             Vector4 uv(u0, 0.0f, 1.0f, 1.0f);
             Vector2 size(maxPixels, texH);
@@ -241,8 +241,8 @@ void Terminal::Draw()
         delete ptex;
     }
 
-    // atualizar piscar de cursor (você já tinha isso; mantive)
-    const float blinkPeriod = 0.5f; // segundos
+
+    const float blinkPeriod = 0.5f;
     static Uint32 lastTicks = SDL_GetTicks();
     Uint32 now = SDL_GetTicks();
     float dt = (now - lastTicks) / 1000.0f;
@@ -253,7 +253,7 @@ void Terminal::Draw()
     }
 }
 
-// ...
+
 void Terminal::AddLine(const std::string &line)
 {
     mLines.push_back(line);
