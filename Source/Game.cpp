@@ -13,6 +13,7 @@
 #include "CSV.h"
 #include "Game.h"
 
+#include <sstream>
 #include <SDL2/SDL_ttf.h>
 
 #include "Components/Drawing/DrawComponent.h"
@@ -317,6 +318,7 @@ void Game::UpdateGame(float deltaTime)
     if (!command.empty())
     {
         SDL_Log("Terminal command: %s", command.c_str());
+        ProcessTerminalCommand(command);
     }
 }
 
@@ -469,4 +471,65 @@ void Game::Shutdown()
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
+}
+
+void Game::ProcessTerminalCommand(const std::string& input)
+{
+    std::string command = input;
+    std::transform(command.begin(), command.end(), command.begin(), ::toupper);
+
+    // Usa stringstream para dividir a linha em tokens (palavra por palavra)
+    std::stringstream ss(command);
+    std::string verb; // O comando principal (ex: JUMP, SET, GET, ADD)
+    std::string arg1, arg2, arg3; // Argumentos (ex: ACTOR_NAME, ATTRIBUTE, VALUE)
+
+    ss >> verb; // Lê o primeiro token (o comando/verbo)
+
+    if (verb == "JUMP")
+    {
+        mObjManager->Jump();
+    }
+    else if (verb == "GET")
+    {
+        // Formato: GET <NOME_OBJ>
+        if (ss >> arg1)
+        {
+            std::string attributes = mObjManager->GetObjAttributes(arg1);
+            mTerminal->AddLine(attributes);
+        }
+        else
+        {
+            mTerminal->AddLine("Usage: GET <Object Name>");
+        }
+    }
+    else if (verb == "SET")
+    {
+        // Formato: SET <NOME_OBJ> <ATRIBUTO> <VALOR>
+        if (ss >> arg1 >> arg2 >> arg3)
+        {
+            // O SetAttributeValue espera o valor na string original
+            // Você precisará da string de valor *original* (sem o toupper)
+            std::string originalValue = input.substr(input.find(arg3.substr(0,1)));
+
+            mObjManager->SetAttributeValue(arg1, arg2, originalValue);
+        }
+        else
+        {
+            mTerminal->AddLine("Usage: SET <Object Name> <Attribute> <Value>");
+        }
+    }
+    else if (verb == "LIST")
+    {
+        std::vector<std::string_view> names = mObjManager->GetAllObjNames();
+        std::string listStr = "Manageable Objects: ";
+        for (const auto& name : names)
+        {
+            listStr += std::string(name) + " ";
+        }
+        mTerminal->AddLine(listStr);
+    }
+    else
+    {
+        mTerminal->AddLine("Unknown command: " + command);
+    }
 }

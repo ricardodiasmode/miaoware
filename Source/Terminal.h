@@ -23,6 +23,7 @@ public:
   void Toggle();
   void SetActive(bool active);
   bool IsActive() const { return mActive; }
+  void AddLine(const std::string& line);
 
   // processa eventos SDL (use antes de encaminhar eventos ao jogo)
   void ProcessEvent(const SDL_Event& ev);

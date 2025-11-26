@@ -227,3 +227,11 @@ void Terminal::Draw()
     }
 }
 
+// ...
+void Terminal::AddLine(const std::string& line)
+{
+    mLines.push_back(line);
+    if (static_cast<int>(mLines.size()) > mMaxLines - 1) {
+        mLines.pop_front();
+    }
+}
