@@ -2,7 +2,7 @@
 #include <string>
 #include <GL/glew.h>
 #include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 class Texture
 {
@@ -12,6 +12,8 @@ public:
 
 	bool Load(const std::string& fileName);
 	void Unload();
+
+	void CreateFromSurface(struct SDL_Surface* surface);
 
 	void SetActive(int index = 0) const;
 

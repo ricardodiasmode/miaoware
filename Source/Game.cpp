@@ -12,9 +12,13 @@
 #include <fstream>
 #include "CSV.h"
 #include "Game.h"
+
+#include <SDL2/SDL_ttf.h>
+
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
+#include "Terminal.h"
 #include "Actors/Actor.h"
 #include "Actors/Background.h"
 #include "Actors/Block.h"
@@ -37,6 +41,7 @@ Game::Game()
         ,mCameraPos(0.f, 0.f)
         ,mCat(nullptr)
         ,mLevelData(nullptr)
+        ,mTerminal(nullptr)
 {
 
 }
@@ -48,6 +53,11 @@ bool Game::Initialize()
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
+        return false;
+    }
+
+    if (TTF_Init() == -1) {
+        SDL_Log("Failed to initialize SDL_ttf: %s", TTF_GetError());
         return false;
     }
 
@@ -72,6 +82,7 @@ bool Game::Initialize()
     mTicksCount = SDL_GetTicks();
 
     mObjManager = new ObjectManager(this);
+    mTerminal = new Terminal(mRenderer);
 
     return true;
 }
@@ -272,7 +283,19 @@ void Game::ProcessInput()
                 Quit();
                 break;
         }
+
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            mTerminal->Toggle();
+            continue;
+        }
+
+        // Terminal captura eventos
+        mTerminal->ProcessEvent(event);
     }
+
+    if (mTerminal->IsActive())
+        return;
 
     const Uint8* state = SDL_GetKeyboardState(nullptr);
 
@@ -289,6 +312,12 @@ void Game::UpdateGame(float deltaTime)
 
     // Update camera position
     UpdateCamera();
+
+    std::string command = mTerminal->ConsumeCommand();
+    if (!command.empty())
+    {
+        SDL_Log("Terminal command: %s", command.c_str());
+    }
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -410,7 +439,8 @@ void Game::GenerateOutput()
               }
         }
     }
-
+    if (mTerminal)
+        mTerminal->Draw();
     // Swap front buffer and back buffer
     mRenderer->Present();
 }
