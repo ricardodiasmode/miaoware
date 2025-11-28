@@ -22,7 +22,7 @@ class ObjectManager
     Game* mGame = nullptr;
 
 private:
-    Actor* GetActorByName(const std::string& actorName) const;
+    Actor* GetActorByName(std::string actorName) const;
 
 public:
     ObjectManager(Game* game);

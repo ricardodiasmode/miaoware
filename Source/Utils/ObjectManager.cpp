@@ -14,14 +14,16 @@ ObjectManager::ObjectManager(Game *game) : mGame(game)
 
 }
 
-Actor * ObjectManager::GetActorByName(const std::string &actorName) const
+Actor * ObjectManager::GetActorByName(std::string actorName) const
 {
     std::vector<Actor*> allActors = mGame->GetAllActors();
     for (Actor* actor : allActors)
     {
-        if (actor->mIsManageable) {
+        if (actor->mIsManageable)
+        {
             std::string actorNameStr = actor->GetActorName();
             std::transform(actorNameStr.begin(), actorNameStr.end(), actorNameStr.begin(), ::tolower);
+            std::transform(actorName.begin(), actorName.end(), actorName.begin(), ::tolower);
             if (actorNameStr == actorName)
                 return actor;
         }
@@ -49,7 +51,7 @@ std::string ObjectManager::GetObjAttributes(const std::string& objName)
     Actor* desiredActor = GetActorByName(objName);
     if (!desiredActor)
     {
-        SDL_LogError(0, "ObjectManager::GetObjAttributes called with wrong obj name.");
+        SDL_LogError(0, "ObjectManager::GetObjAttributes called with wrong obj name: %s.", objName.c_str());
         return {"none"};
     }
 
@@ -68,7 +70,7 @@ void ObjectManager::SetAttributeValue(const std::string& objName, const std::str
     Actor* actorToModify = GetActorByName(objName);
     if (!actorToModify)
     {
-        SDL_LogError(0, "ObjectManager::SetAttributeValue called with wrong obj name.");
+        SDL_LogError(0, "ObjectManager::SetAttributeValue called with wrong obj name: %s.", objName.c_str());
         return;
     }
 
