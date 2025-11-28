@@ -299,19 +299,20 @@ void Game::ProcessInput()
             Quit();
             break;
         }
-
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        // no menu principal, apenas processa eventos normais
+        // para evitar de "abrir o terminal"
+        if (mCurrentScene != GameScene::MainMenu)
         {
-            mTerminal->Toggle();
-            continue;
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                mTerminal->Toggle();
+                continue;
+            }
+
+            // Terminal captura eventos so na gameplay
+            mTerminal->ProcessEvent(event);
         }
-
-        // Terminal captura eventos
-        mTerminal->ProcessEvent(event);
     }
-
-    if (mTerminal->IsActive())
-        return;
 
     if (mCurrentScene == GameScene::MainMenu)
     {
@@ -324,6 +325,9 @@ void Game::ProcessInput()
         }
         return;
     }
+
+    if (mTerminal->IsActive())
+        return;
 
     const Uint8 *state = SDL_GetKeyboardState(nullptr);
     for (auto actor : mActors)
