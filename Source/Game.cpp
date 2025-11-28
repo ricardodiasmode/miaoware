@@ -82,8 +82,8 @@ bool Game::Initialize()
 
 void Game::InitializeActors()
 {
-    // int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    //int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
     BuildLevel(level, Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
 }
 
@@ -227,7 +227,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
             }
             case 99:
                 // bloco manageable
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", true, true);
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png");
                 break;
             default:
                 break;

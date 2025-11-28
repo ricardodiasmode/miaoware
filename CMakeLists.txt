@@ -19,58 +19,17 @@ set(SDL2_IMAGE_LIB_MSVC   "${SDL2_ROOT}/lib/x64/SDL2_image.lib")
 set(SDL2_IMAGE_LIB_MINGW  "${SDL2_ROOT}/lib/x64/libSDL2_image.a")
 set(SDL2_IMAGE_DLL        "${SDL2_ROOT}/lib/x64/SDL2_image.dll")
 
-set(SOURCES
-        Source/Renderer/Shader.cpp
-        Source/Renderer/Shader.h
-        Source/Main.cpp
-        Source/Math.cpp
-        Source/Math.h
-        Source/Random.cpp
-        Source/Random.h
-        Source/Game.cpp
-        Source/Game.h
-        Source/Actors/Actor.cpp
-        Source/Actors/Actor.h
-        Source/Components/Component.cpp
-        Source/Components/Component.h
-        Source/Components/Drawing/DrawComponent.cpp
-        Source/Components/Drawing/DrawComponent.h
-        Source/Components/Physics/RigidBodyComponent.cpp
-        Source/Components/Physics/RigidBodyComponent.h
-        Source/Components/Physics/AABBColliderComponent.cpp
-        Source/Components/Physics/AABBColliderComponent.h
-        Source/Components/ParticleSystemComponent.cpp
-        Source/Components/ParticleSystemComponent.h
-        Source/Renderer/Renderer.cpp
-        Source/Renderer/Renderer.h
-        Source/Renderer/VertexArray.h
-        Source/Renderer/VertexArray.cpp
-        Source/Renderer/Texture.cpp
-        Source/Renderer/Texture.h
-        Source/Actors/Block.cpp
-        Source/Actors/Block.h
-        Source/Actors/Goomba.cpp
-        Source/Actors/Goomba.h
-        Source/Actors/Spawner.cpp
-        Source/Actors/Spawner.h
-        Source/Actors/Cat.cpp
-        Source/Actors/Cat.h
-        Source/Components/Drawing/AnimatorComponent.cpp
-        Source/Components/Drawing/AnimatorComponent.h
-        Source/Components/Drawing/RectComponent.cpp
-        Source/Components/Drawing/RectComponent.h
-        Source/Actors/Background.cpp
-        Source/Actors/Background.h
-        Source/Components/Drawing/TextureComponent.cpp
-        Source/Components/Drawing/TextureComponent.h
-        Source/Actors/MovingBlock.cpp
-        Source/Actors/MovingBlock.h
-        Source/Actors/SpawnBlock.cpp
-        Source/Actors/SpawnBlock.h
-        Source/Actors/Mushroom.cpp
-        Source/Actors/Mushroom.h
-        Source/Utils/ObjectManager.cpp
-        Source/Utils/ObjectManager.h
+set(SDL2_MIXER_INCLUDE_DIR "${SDL2_ROOT}/include")
+set(SDL2_MIXER_LIB_MSVC   "${SDL2_ROOT}/lib/x64/SDL2_mixer.lib")
+set(SDL2_MIXER_DLL        "${SDL2_ROOT}/lib/x64/SDL2_mixer.dll")
+
+set(SDL2_TTF_INCLUDE_DIR "${SDL2_ROOT}/include")
+set(SDL2_TTF_LIB_MSVC   "${SDL2_ROOT}/lib/x64/SDL2_ttf.lib")
+set(SDL2_TTF_DLL        "${SDL2_ROOT}/lib/x64/SDL2_ttf.dll")
+
+file(GLOB_RECURSE SOURCES
+        Source/*.cpp
+        Source/*.h
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -78,6 +37,10 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLEW_INCLUDE_DIR}")
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${SDL2_IMAGE_INCLUDE_DIR}")
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${SDL2_MIXER_INCLUDE_DIR}")
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${SDL2_TTF_INCLUDE_DIR}")
 
 if (NOT MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mconsole")
@@ -135,6 +98,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         SDL2::SDL2
         ${SDL2_IMAGE_LIBRARY}
         ${GLEW_LIBRARY}
+        ${SDL2_MIXER_LIB_MSVC}
+        ${SDL2_TTF_LIB_MSVC}
         opengl32
 )
 
@@ -151,6 +116,16 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${GLEW_ROOT}/bin/Release/x64/glew32.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SDL2_MIXER_DLL}"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SDL2_TTF_DLL}"
         $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
 file(GLOB_RECURSE SHADER_FILES "${CMAKE_SOURCE_DIR}/Shaders/*")
