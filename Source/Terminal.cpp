@@ -85,14 +85,41 @@ void Terminal::ProcessEvent(const SDL_Event &ev)
         {
             SubmitLine();
         }
+        else if (k == SDLK_UP)
+        {
+            if (!mHistory.empty())
+            {
+                if (mHistoryIndex == -1)
+                    mHistoryIndex = (int)mHistory.size() - 1;
+                else if (mHistoryIndex > 0)
+                    mHistoryIndex--;
+
+                mBuffer = mHistory[mHistoryIndex];
+            }
+        }
+        else if (k == SDLK_DOWN)
+        {
+            if (!mHistory.empty() && mHistoryIndex != -1)
+            {
+                mHistoryIndex++;
+
+                if (mHistoryIndex >= (int)mHistory.size())
+                {
+                    mHistoryIndex = -1;
+                    mBuffer.clear();
+                }
+                else
+                {
+                    mBuffer = mHistory[mHistoryIndex];
+                }
+            }
+        }
         else if (k == SDLK_TAB)
         {
-            // opcional: inserir 4 espaços
-            AppendChar(std::string("    "));
+            AppendChar("    ");
         }
         else if (k == SDLK_v && (SDL_GetModState() & KMOD_CTRL))
         {
-            // Ctrl+V -> colar (do clipboard)
             char *clip = SDL_GetClipboardText();
             if (clip)
             {
@@ -131,6 +158,10 @@ void Terminal::SubmitLine()
             mLines.pop_front();
         }
         mLastCommand = mBuffer;
+
+        mHistory.push_back(mBuffer);
+        mHistoryIndex = -1; // reset navegação
+
         mBuffer.clear();
     }
 }

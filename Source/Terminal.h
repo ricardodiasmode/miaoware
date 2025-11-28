@@ -5,6 +5,7 @@
 #include <string>
 #include <deque>
 #include <SDL.h>
+#include <vector>
 
 class Renderer;
 class Font;
@@ -50,4 +51,7 @@ private:
 
   float mCursorBlink;
   bool mCursorOn;
+
+  std::vector<std::string> mHistory;
+  int mHistoryIndex = -1;
 };

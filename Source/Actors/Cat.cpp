@@ -17,6 +17,8 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
         , mIsDead(false)
         , mForwardSpeed(forwardSpeed)
         , mJumpSpeed(jumpSpeed)
+        , mDirection(1)
+        , mAutoWalk(true)
 {
     mDrawComponent = new AnimatorComponent(this,
         "../Assets/Sprites/Mario/Mario.png",
@@ -66,6 +68,12 @@ void Cat::Jump()
 
 void Cat::OnProcessInput(const uint8_t* state)
 {
+    if (mAutoWalk)
+    {
+        mIsRunning = true;
+        return;
+    }
+
     if (state[SDL_SCANCODE_A])
     {
         const Vector2 speed(-mForwardSpeed, 0.f);
@@ -95,6 +103,20 @@ void Cat::OnProcessInput(const uint8_t* state)
 
 void Cat::OnUpdate(float deltaTime)
 {
+    if (mAutoWalk && mRigidBodyComponent)
+    {
+        Vector2 vel = mRigidBodyComponent->GetVelocity();
+        vel.x = mDirection * mForwardSpeed;
+        mRigidBodyComponent->SetVelocity(vel);
+        mIsRunning = true;
+
+        // ajustar escala pra "olhar" direção correta
+        if (mDirection < 0)
+            SetScale(Vector2(-1.f, 1.f));
+        else
+            SetScale(Vector2(1.f, 1.f));
+    }
+
     if (GetPosition().x < 0.f)
     {
         Vector2 posToSet(0.f, GetPosition().y);
@@ -186,6 +208,8 @@ void Cat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* o
     {
         other->GetOwner()->SetState(ActorState::Destroy);
         EatMushroomEffect();
+    } else if (mAutoWalk){
+        ReverseDirection();
     }
 }
 
@@ -209,4 +233,18 @@ void Cat::OnVerticalCollision(const float minOverlap, AABBColliderComponent* oth
         other->GetOwner()->SetState(ActorState::Destroy);
         EatMushroomEffect();
     }
+}
+
+void Cat::ReverseDirection()
+{
+    mDirection *= -1;
+    // imediatamente ajustar velocidade horizontal
+    if (mRigidBodyComponent)
+    {
+        Vector2 vel = mRigidBodyComponent->GetVelocity();
+        vel.x = mDirection * mForwardSpeed;
+        mRigidBodyComponent->SetVelocity(vel);
+    }
+    // ajustar sprite
+    SetScale(Vector2((mDirection < 0 ? -1.f : 1.f), 1.f));
 }

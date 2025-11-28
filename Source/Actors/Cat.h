@@ -8,7 +8,7 @@
 class Cat : public Actor
 {
 public:
-    explicit Cat(Game* game, const std::string& uniqueName, float forwardSpeed = 1500.0f, float jumpSpeed = -750.0f);
+    explicit Cat(Game* game, const std::string& uniqueName, float forwardSpeed = 180.0f, float jumpSpeed = -750.0f);
 
     void Jump();
 
@@ -30,12 +30,16 @@ private:
     void DecreaseSize();
 
     void ManageAnimations();
+    void ReverseDirection();
 
     float mForwardSpeed;
     float mJumpSpeed;
     bool mIsRunning;
     bool mIsDead;
     bool mIsBig;
+
+    int mDirection;
+    bool mAutoWalk;
 
     class RigidBodyComponent* mRigidBodyComponent;
     class AnimatorComponent* mDrawComponent;
