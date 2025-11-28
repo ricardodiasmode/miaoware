@@ -7,6 +7,7 @@
 #include "../Game.h"
 #include "../Actors/Cat.h"
 #include <vector>
+#include <algorithm>
 
 ObjectManager::ObjectManager(Game *game) : mGame(game)
 {
@@ -18,8 +19,12 @@ Actor * ObjectManager::GetActorByName(const std::string &actorName) const
     std::vector<Actor*> allActors = mGame->GetAllActors();
     for (Actor* actor : allActors)
     {
-        if (actor->GetActorName() == actorName)
-            return actor;
+        if (actor->mIsManageable) {
+            std::string actorNameStr = actor->GetActorName();
+            std::transform(actorNameStr.begin(), actorNameStr.end(), actorNameStr.begin(), ::tolower);
+            if (actorNameStr == actorName)
+                return actor;
+        }
     }
     return nullptr;
 }

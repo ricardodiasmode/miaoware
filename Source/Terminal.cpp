@@ -117,7 +117,6 @@ void Terminal::Backspace()
     if (mBuffer.empty())
         return;
 
-
     mBuffer.pop_back();
 }
 
@@ -148,7 +147,6 @@ void Terminal::Draw()
     if (!mFont)
         return;
 
-
     const float levelHeightPx = ((Game::LEVEL_HEIGHT)*Game::TILE_SIZE);
 
     const float posX = Game::WINDOW_WIDTH / 2;
@@ -160,20 +158,15 @@ void Terminal::Draw()
     const float padX = 8.0f;
     const float padY = 6.0f;
 
-
     mRenderer->DrawRect(Vector2(posX, posY), Vector2(width, height), 0.0f,
                         Vector3(0.03f, 0.03f, 0.03f), Vector2::Zero, RendererMode::TRIANGLES);
-
 
     float left = posX - width * 0.5f;
     float top = posY - height * 0.5f;
 
-
-
     float drawX = left + padX;
     float drawY = top + padY;
     float maxPixels = width - 2 * padX;
-
 
     for (const auto &ln : mLines)
     {
@@ -202,7 +195,6 @@ void Terminal::Draw()
             mRenderer->DrawTexture(centerPos, size, 0.0f,
                                    Vector3(1, 1, 1), tex, uv, Vector2::Zero, false, 1.0f);
         }
-
         tex->Unload();
         delete tex;
 
@@ -210,7 +202,6 @@ void Terminal::Draw()
         if (drawY + lineHeight > top + height - padY)
             break;
     }
-
 
     std::string prompt = "mioware@user:~$ " + mBuffer + (mCursorOn ? "_" : " ");
     Texture *ptex = mFont->RenderText(prompt, Vector3(1, 1, 1), mPointSize);
@@ -228,7 +219,6 @@ void Terminal::Draw()
         }
         else
         {
-
             float u0 = (texW - maxPixels) / texW;
             Vector4 uv(u0, 0.0f, 1.0f, 1.0f);
             Vector2 size(maxPixels, texH);
@@ -236,11 +226,11 @@ void Terminal::Draw()
             mRenderer->DrawTexture(centerPos, size, 0.0f,
                                    Vector3(1, 1, 1), ptex, uv, Vector2::Zero, false, 1.0f);
         }
-
         ptex->Unload();
         delete ptex;
     }
 
+    this->DrawHelper(left, top, width);
 
     const float blinkPeriod = 0.5f;
     static Uint32 lastTicks = SDL_GetTicks();
@@ -253,12 +243,71 @@ void Terminal::Draw()
     }
 }
 
-
 void Terminal::AddLine(const std::string &line)
 {
     mLines.push_back(line);
     if (static_cast<int>(mLines.size()) > mMaxLines - 1)
     {
         mLines.pop_front();
+    }
+}
+
+void Terminal::DrawHelper(float left, float top, float width)
+{
+    {
+        float panelWidth = 350.0f;
+        float panelHeight = 240.0f;
+
+        // canto direito do terminal
+        float px = left + width - panelWidth - 10.0f;
+        float py = top + 10.0f;
+
+        // fundo do painel
+        mRenderer->DrawRect(
+            Vector2(px + panelWidth * 0.5f, py + panelHeight * 0.5f),
+            Vector2(panelWidth, panelHeight),
+            0.0f,
+            Vector3(0.10f, 0.10f, 0.10f), // cor
+            Vector2::Zero,
+            RendererMode::TRIANGLES);
+
+        const char *helpLines[] = {
+            "Commands:",
+            "  jump",
+            "  get <objName>",
+            "  set <objName> <attr> <value>",
+            "  list",
+            "Attributes (attr):",
+            "  rotation     value: x            (float)",
+            "  position     value: (x,y)        (floats)",
+            "  scale        value: (x,y)        (floats)"};
+
+        float textX = px + 10.0f;
+        float textY = py + 10.0f;
+
+        for (const char *line : helpLines)
+        {
+            Texture *tex = mFont->RenderText(line, Vector3(1, 1, 1), mPointSize);
+            if (tex)
+            {
+                float w = (float)tex->GetWidth();
+                float h = (float)tex->GetHeight();
+
+                mRenderer->DrawTexture(
+                    Vector2(textX + w * 0.5f, textY + h * 0.5f),
+                    Vector2(w, h),
+                    0.0f,
+                    Vector3(1, 1, 1),
+                    tex,
+                    Vector4(0, 0, 1, 1),
+                    Vector2::Zero,
+                    false,
+                    1.0f);
+
+                tex->Unload();
+                delete tex;
+                textY += h + 4.0f;
+            }
+        }
     }
 }

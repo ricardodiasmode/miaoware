@@ -469,22 +469,21 @@ void Game::Shutdown()
 void Game::ProcessTerminalCommand(const std::string &input)
 {
     std::string command = input;
-    std::transform(command.begin(), command.end(), command.begin(), ::toupper);
+    std::transform(command.begin(), command.end(), command.begin(), ::tolower);
 
     // Usa stringstream para dividir a linha em tokens (palavra por palavra)
     std::stringstream ss(command);
-    std::string verb;             // O comando principal (ex: JUMP, SET, GET, ADD)
+    std::string verb;             // O comando principal (ex: jump, set, get, add)
     std::string arg1, arg2, arg3; // Argumentos (ex: ACTOR_NAME, ATTRIBUTE, VALUE)
 
     ss >> verb; // Lê o primeiro token (o comando/verbo)
 
-    if (verb == "JUMP")
+    if (verb == "jump")
     {
         mObjManager->Jump();
     }
-    else if (verb == "GET")
+    else if (verb == "get")
     {
-        // Formato: GET <NOME_OBJ>
         if (ss >> arg1)
         {
             std::string attributes = mObjManager->GetObjAttributes(arg1);
@@ -495,9 +494,9 @@ void Game::ProcessTerminalCommand(const std::string &input)
             mTerminal->AddLine("Usage: GET <Object Name>");
         }
     }
-    else if (verb == "SET")
+    else if (verb == "set")
     {
-        // Formato: SET <NOME_OBJ> <ATRIBUTO> <VALOR>
+        // Formato: set <NOME_OBJ> <ATRIBUTO> <VALOR>
         if (ss >> arg1 >> arg2 >> arg3)
         {
             // O SetAttributeValue espera o valor na string original
@@ -508,10 +507,10 @@ void Game::ProcessTerminalCommand(const std::string &input)
         }
         else
         {
-            mTerminal->AddLine("Usage: SET <Object Name> <Attribute> <Value>");
+            mTerminal->AddLine("Usage: set <Object Name> <Attribute> <Value>");
         }
     }
-    else if (verb == "LIST")
+    else if (verb == "list")
     {
         std::vector<std::string_view> names = mObjManager->GetAllObjNames();
         std::string listStr = "Manageable Objects: ";
