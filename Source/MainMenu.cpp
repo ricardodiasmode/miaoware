@@ -3,12 +3,19 @@
 #include "Renderer/Texture.h"
 #include "Renderer/Font.h"
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <string>
 
 class MainMenu {
 public:
     MainMenu(Game* game, Font* font)
-        : mGame(game), mFont(font), mSelected(0), mClosed(false) {}
+        : mGame(game), mFont(font), mSelected(0), mClosed(false) {
+        // Load click/start SFX (use chunk API for short sound effects)
+        mClickSfx = Mix_LoadWAV("../Assets/Sounds/MainMenuMeow.mp3");
+        if (!mClickSfx) {
+            SDL_Log("MainMenu: failed to load click SFX: %s", Mix_GetError());
+        }
+    }
 
     void Close() { mClosed = true; }
 
@@ -53,7 +60,7 @@ public:
         }
 
         // Buttons
-        DrawButton(Vector2(cx, cy), "Compartilhar", mSelected == 0);
+        DrawButton(Vector2(cx, cy), "Start Game", mSelected == 0);
         DrawButton(Vector2(cx, cy + 80), "Quit", mSelected == 1);
     }
 
@@ -83,7 +90,11 @@ private:
     void OnClick()
     {
         if (mSelected == 0) {
-            // Compartilhar
+            // Start game: play SFX, then switch scene
+            if (mClickSfx) {
+                Mix_VolumeChunk(mClickSfx, MIX_MAX_VOLUME);
+                Mix_PlayChannel(-1, mClickSfx, 0);
+            }
             mGame->SetScene(Game::GameScene::Playing);
             Close();
         } else {
@@ -97,4 +108,5 @@ private:
     Font* mFont;
     int mSelected;
     bool mClosed;
+    Mix_Chunk* mClickSfx = nullptr;
 };

@@ -32,6 +32,7 @@
 #include "Components/Drawing/AnimatorComponent.h"
 #include "Utils/ObjectManager.h"
 #include "Renderer/Font.h"
+#include "AudioSystem.h"
 
 Game::Game()
     : mWindow(nullptr)
@@ -46,6 +47,7 @@ Game::Game()
     , mTerminal(nullptr)
     , mCurrentScene(GameScene::MainMenu)
     , mUiFont(nullptr)
+    , mAudio(nullptr)
 {
 }
 
@@ -83,6 +85,12 @@ bool Game::Initialize()
 
     mUiFont = new Font();
     mUiFont->Load("../Assets/Fonts/Arial.ttf");
+
+    mAudio = new AudioSystem();
+    if (!mAudio->Initialize())
+    {
+        SDL_Log("AudioSystem failed to initialize");
+    }
 
     mTicksCount = SDL_GetTicks();
 
@@ -310,6 +318,7 @@ void Game::ProcessInput()
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
         if (keys[SDL_SCANCODE_RETURN])
         {
+            if (mAudio) mAudio->PlaySound("MainMenuMeow.mp3", false);
             InitializeActors();
             mCurrentScene = GameScene::Playing;
         }
@@ -327,6 +336,7 @@ void Game::UpdateGame(float deltaTime)
 {
     if (mCurrentScene == GameScene::MainMenu)
     {
+        if (mAudio) mAudio->Update();
         return; // não atualiza nada no menu principal
     }
     // Update all actors and pending actors
@@ -334,6 +344,8 @@ void Game::UpdateGame(float deltaTime)
 
     // Update camera position
     UpdateCamera();
+
+    if (mAudio) mAudio->Update();
 
     std::string command = mTerminal->ConsumeCommand();
     if (!command.empty())
@@ -511,6 +523,13 @@ void Game::Shutdown()
 
     delete mObjManager;
     mObjManager = nullptr;
+
+    if (mAudio)
+    {
+        mAudio->Shutdown();
+        delete mAudio;
+        mAudio = nullptr;
+    }
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
