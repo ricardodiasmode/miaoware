@@ -452,7 +452,7 @@ void Game::GenerateOutput()
     {
         if (mUiFont)
         {
-            Texture *tex = mUiFont->RenderText("Start Game", Vector3(1,1,1), 28);
+            Texture *tex = mUiFont->RenderText("Compartilhar", Vector3(1,1,1), 28);
             if (tex)
             {
                 float w = (float)tex->GetWidth();

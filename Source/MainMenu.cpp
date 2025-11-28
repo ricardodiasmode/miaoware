@@ -28,6 +28,13 @@ public:
     void Draw()
     {
         Renderer* r = mGame->GetRenderer();
+        r->DrawRect(
+            Vector2(Game::WINDOW_WIDTH * 0.5f, Game::WINDOW_HEIGHT * 0.5f),
+            Vector2((float)Game::WINDOW_WIDTH, (float)Game::WINDOW_HEIGHT),
+            0.0f,
+            Vector3(0.0f, 0.0f, 0.0f),
+            Vector2::Zero,
+            RendererMode::TRIANGLES);
         // Center positions
         float cx = Game::WINDOW_WIDTH * 0.5f;
         float cy = Game::WINDOW_HEIGHT * 0.5f;
@@ -46,7 +53,7 @@ public:
         }
 
         // Buttons
-        DrawButton(Vector2(cx, cy), "Start Game", mSelected == 0);
+        DrawButton(Vector2(cx, cy), "Compartilhar", mSelected == 0);
         DrawButton(Vector2(cx, cy + 80), "Quit", mSelected == 1);
     }
 
@@ -76,7 +83,7 @@ private:
     void OnClick()
     {
         if (mSelected == 0) {
-            // Start game
+            // Compartilhar
             mGame->SetScene(Game::GameScene::Playing);
             Close();
         } else {
