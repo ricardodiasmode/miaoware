@@ -6,7 +6,6 @@
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
 #include "../../Json.h"
-#include "../../Renderer/Texture.h"
 #include <fstream>
 
 AnimatorComponent::AnimatorComponent(class Actor* owner, const std::string &texPath, const std::string &dataPath,

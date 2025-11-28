@@ -103,4 +103,5 @@ private:
 
     class ObjectManager *mObjManager = nullptr;
     class Terminal *mTerminal;
+    class DialogManager *mDialogManager = nullptr;
 };

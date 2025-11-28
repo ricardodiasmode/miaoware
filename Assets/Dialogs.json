@@ -1,0 +1,59 @@
+{
+  "dialogs": [
+    {
+      "id": "FASE1",
+      "lines": [
+        {
+          "text": "Ei, voce ai! Vai ficar so olhando?"
+        },
+        {
+          "text": "Me ajuda a passar desse firewall, de preferencia sem virar espetinho de gato."
+        },
+        {
+          "text": "E sim, bem cliche. Nao existem mais bons game designers hoje em dia!"
+        }
+      ]
+    },
+    {
+      "id": "FASE2",
+      "lines": [
+        {
+          "text": "Ah otimo, um pedaco no caminho ta criptografado. Boa sorte, eu dormi so 12 horas ontem..."
+        }
+      ]
+    },
+    {
+      "id": "FASE3",
+      "lines": [
+        {
+          "text": "Não me misturo com essa gentalha."
+        }
+      ]
+    },
+    {
+      "id": "FASE4",
+      "lines": [
+        {
+          "text": "Agora que eu ja te ensinei tudo, pequeno padawan, me leve ate o meu destino."
+        },
+        {
+          "text": "O que? Claro que eu poderia fazer isso sozinho, mas para que eu faria isso se tem um humano para me servir?"
+        }
+      ]
+    },
+    {
+      "id": "FASE5",
+      "lines": [
+        {
+          "text": "Chegamos! Voce ta preparado? Voce vai me ver na minha forma final."
+        },
+        {
+          "text": "Espero que esteja sentado para ver todo o meu poder!"
+        },
+        {
+          "text": "Finalmente... o momento chegou. O universo inteiro esperou por isso. Cada clique que você deu, cada comando errado, cada vez que você me deixou cair no abismo por pura incompetência... tudo nos trouxe até aqui.\n\nVocê não percebeu, humano, mas esteve participando de um ritual ancestral, uma jornada mística que poucos mortais conseguem completar — e olha que vários desistiram na parte do firewall, o que diz muito sobre a espécie humana.\n\nEu, o grandioso, magnífico, sublime e absolutamente impecável arquifelinus supremo, atravessei criptografias impossíveis, paredes mal otimizadas e cachorros que claramente tiveram problemas de design. E tudo isso enquanto mantinha meu pelo brilhante e minha postura impecável."
+        }
+      ]
+    }
+  ]
+}

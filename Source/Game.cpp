@@ -28,6 +28,7 @@
 #include "Actors/Cat.h"
 #include "Actors/Mushroom.h"
 #include "Actors/SpawnBlock.h"
+#include "Utils/DialogManager.h"
 #include "Utils/ObjectManager.h"
 
 Game::Game()
@@ -74,6 +75,7 @@ bool Game::Initialize()
 
     mObjManager = new ObjectManager(this);
     mTerminal = new Terminal(mRenderer);
+    mDialogManager = new DialogManager(mTerminal);
 
     return true;
 }
