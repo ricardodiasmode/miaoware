@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------
 // From Game Programming in C++ by Sanjay Madhav
 // Copyright (C) 2017 Sanjay Madhav. All rights reserved.
-// 
+//
 // Released under the BSD License
 // See LICENSE in root directory for full details.
 // ----------------------------------------------------------------
@@ -12,9 +12,14 @@
 #include <fstream>
 #include "CSV.h"
 #include "Game.h"
+
+#include <sstream>
+#include <SDL_ttf.h>
+
 #include "Components/Drawing/DrawComponent.h"
 #include "Components/Physics/RigidBodyComponent.h"
 #include "Random.h"
+#include "Terminal.h"
 #include "Actors/Actor.h"
 #include "Actors/Background.h"
 #include "Actors/Block.h"
@@ -28,17 +33,8 @@
 #include "Utils/ObjectManager.h"
 
 Game::Game()
-        :mWindow(nullptr)
-        ,mRenderer(nullptr)
-        ,mTicksCount(0)
-        ,mIsRunning(true)
-        ,mIsDebugging(false)
-        ,mUpdatingActors(false)
-        ,mCameraPos(0.f, 0.f)
-        ,mCat(nullptr)
-        ,mLevelData(nullptr)
+    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr)
 {
-
 }
 
 bool Game::Initialize()
@@ -51,6 +47,12 @@ bool Game::Initialize()
         return false;
     }
 
+    if (TTF_Init() == -1)
+    {
+        SDL_Log("Failed to initialize SDL_ttf: %s", TTF_GetError());
+        return false;
+    }
+
     mWindow = SDL_CreateWindow("miaoware", 100, 100, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
     if (!mWindow)
     {
@@ -58,7 +60,8 @@ bool Game::Initialize()
         return false;
     }
 
-    if (IMG_Init(IMG_INIT_PNG) == 0) {
+    if (IMG_Init(IMG_INIT_PNG) == 0)
+    {
         SDL_Log("Unable to initialize SDL_image: %s", SDL_GetError());
         return false;
     }
@@ -72,21 +75,22 @@ bool Game::Initialize()
     mTicksCount = SDL_GetTicks();
 
     mObjManager = new ObjectManager(this);
+    mTerminal = new Terminal(mRenderer);
 
     return true;
 }
 
 void Game::InitializeActors()
 {
-    //int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    int** level = LoadLevel("../Assets/Levels/Level1-2/level1-2.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    // int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    int **level = LoadLevel("../Assets/Levels/Level1-2/level1-2.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
     BuildLevel(level, Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
 }
 
-int **Game::LoadLevel(const std::string& fileName, int width, int height)
+int **Game::LoadLevel(const std::string &fileName, int width, int height)
 {
     // Aloca a matriz de inteiros (height x width)
-    int** level = new int*[height];
+    int **level = new int *[height];
     for (int i = 0; i < height; i++)
     {
         level[i] = new int[width];
@@ -136,9 +140,9 @@ int **Game::LoadLevel(const std::string& fileName, int width, int height)
     return level;
 }
 
-void Game::BuildLevel(int** levelData, int width, int height)
+void Game::BuildLevel(int **levelData, int width, int height)
 {
-    auto* bg = new Background(this, "Background", "../Assets/Sprites/Background.png");
+    auto *bg = new Background(this, "Background", "../Assets/Sprites/Background.png");
     bg->SetPosition(Vector2(3408, 210));
 
     // Percorre a matriz de tiles
@@ -151,79 +155,78 @@ void Game::BuildLevel(int** levelData, int width, int height)
 
             int posX = col * TILE_SIZE;
             int posY = row * TILE_SIZE;
-            Block* NewBlock = nullptr;
+            Block *NewBlock = nullptr;
 
             // Instancia objetos baseado no ID do tile
             switch (tileID)
             {
-                case 0:
-                    // Chão
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockA.png");
-                    break;
-                case 1:
+            case 0:
+                // Chão
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockA.png");
+                break;
+            case 1:
+            {
+                // Interrogação
+                // Hardcodando posições porque nao foi especificado como seria a pré-definição (poderia ser em .csv também)
+                static const std::vector<Vector2> spawnableBlocks = {
+                    Vector2(2, 34),
+                    Vector2(10, 162)};
+                const Vector2 currentPos(row, col);
+                if (std::find(spawnableBlocks.begin(), spawnableBlocks.end(), currentPos) != spawnableBlocks.end())
                 {
-                    // Interrogação
-                    // Hardcodando posições porque nao foi especificado como seria a pré-definição (poderia ser em .csv também)
-                    static const std::vector<Vector2> spawnableBlocks = {
-                        Vector2(2, 34),
-                        Vector2(10, 162)
-                    };
-                    const Vector2 currentPos(row, col);
-                    if (std::find(spawnableBlocks.begin(), spawnableBlocks.end(), currentPos) != spawnableBlocks.end())
-                    {
-                        NewBlock = SpawnBlock::create<Mushroom>(
-                        this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", 100.f);
-                    } else
-                    {
-                        NewBlock = new MovingBlock(
-                        this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png"
-                        );
-                    }
-                    break;
+                    NewBlock = SpawnBlock::create<Mushroom>(
+                        this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", 100.f);
                 }
-                case 4:
-                    // Brick
-                    NewBlock = new MovingBlock(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockB.png");
-                    break;
-                case 8:
-                    // Chão especial
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
-                    break;
-                case 10:
+                else
                 {
-                    auto* spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
-                    const Vector2 pos(posX, posY);
-                    spawner->SetPosition(pos);
-                    break;
+                    NewBlock = new MovingBlock(
+                        this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png");
                 }
-                case 12:
-                    // Cano verde cima direita
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockG.png");
-                    break;
-                case 2:
-                    // Cano verde cima esquerda
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockF.png");
-                    break;
-                case 9:
-                    // cano verde baixo esquerda
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockH.png");
-                    break;
-                case 6:
-                    // Cano verde baixo direita
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockI.png");
-                    break;
-                case 7:
-                    // Cano verde topo direito
-                    NewBlock = new Block(this, "Block"+std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
-                    break;
-                case 16:
-                {
-                    mCat = new Cat(this, "Player"+std::to_string(objNum));
-                    const Vector2 pos(posX, posY);
-                    mCat->SetPosition(pos);
-                }
-                default:
-                    break;
+                break;
+            }
+            case 4:
+                // Brick
+                NewBlock = new MovingBlock(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockB.png");
+                break;
+            case 8:
+                // Chão especial
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
+                break;
+            case 10:
+            {
+                auto *spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
+                const Vector2 pos(posX, posY);
+                spawner->SetPosition(pos);
+                break;
+            }
+            case 12:
+                // Cano verde cima direita
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockG.png");
+                break;
+            case 2:
+                // Cano verde cima esquerda
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockF.png");
+                break;
+            case 9:
+                // cano verde baixo esquerda
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockH.png");
+                break;
+            case 6:
+                // Cano verde baixo direita
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockI.png");
+                break;
+            case 7:
+                // Cano verde topo direito
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
+                break;
+            case 16:
+            {
+                mCat = new Cat(this, "Player" + std::to_string(objNum));
+                const Vector2 pos(posX, posY);
+                mCat->SetPosition(pos);
+            }
+            default:
+                break;
             }
             if (NewBlock)
             {
@@ -268,13 +271,25 @@ void Game::ProcessInput()
     {
         switch (event.type)
         {
-            case SDL_QUIT:
-                Quit();
-                break;
+        case SDL_QUIT:
+            Quit();
+            break;
         }
+
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            mTerminal->Toggle();
+            continue;
+        }
+
+        // Terminal captura eventos
+        mTerminal->ProcessEvent(event);
     }
 
-    const Uint8* state = SDL_GetKeyboardState(nullptr);
+    if (mTerminal->IsActive())
+        return;
+
+    const Uint8 *state = SDL_GetKeyboardState(nullptr);
 
     for (auto actor : mActors)
     {
@@ -289,6 +304,13 @@ void Game::UpdateGame(float deltaTime)
 
     // Update camera position
     UpdateCamera();
+
+    std::string command = mTerminal->ConsumeCommand();
+    if (!command.empty())
+    {
+        SDL_Log("Terminal command: %s", command.c_str());
+        ProcessTerminalCommand(command);
+    }
 }
 
 void Game::UpdateActors(float deltaTime)
@@ -306,7 +328,7 @@ void Game::UpdateActors(float deltaTime)
     }
     mPendingActors.clear();
 
-    std::vector<Actor*> deadActors;
+    std::vector<Actor *> deadActors;
     for (auto actor : mActors)
     {
         if (actor->GetState() == ActorState::Destroy)
@@ -325,7 +347,7 @@ void Game::UpdateCamera()
 {
     if (!mCat)
         return;
-    float desiredXLoc = mCat->GetPosition().x - WINDOW_WIDTH/2.f;
+    float desiredXLoc = mCat->GetPosition().x - WINDOW_WIDTH / 2.f;
 
     if (desiredXLoc < 0.f)
         desiredXLoc = 0.f;
@@ -335,7 +357,7 @@ void Game::UpdateCamera()
     SetCameraPos(clampedPos);
 }
 
-void Game::AddActor(Actor* actor)
+void Game::AddActor(Actor *actor)
 {
     if (mUpdatingActors)
     {
@@ -347,7 +369,7 @@ void Game::AddActor(Actor* actor)
     }
 }
 
-void Game::RemoveActor(Actor* actor)
+void Game::RemoveActor(Actor *actor)
 {
     auto iter = std::find(mPendingActors.begin(), mPendingActors.end(), actor);
     if (iter != mPendingActors.end())
@@ -370,9 +392,8 @@ void Game::AddDrawable(class DrawComponent *drawable)
 {
     mDrawables.emplace_back(drawable);
 
-    std::sort(mDrawables.begin(), mDrawables.end(),[](DrawComponent* a, DrawComponent* b) {
-        return a->GetDrawOrder() < b->GetDrawOrder();
-    });
+    std::sort(mDrawables.begin(), mDrawables.end(), [](DrawComponent *a, DrawComponent *b)
+              { return a->GetDrawOrder() < b->GetDrawOrder(); });
 }
 
 void Game::RemoveDrawable(class DrawComponent *drawable)
@@ -381,12 +402,12 @@ void Game::RemoveDrawable(class DrawComponent *drawable)
     mDrawables.erase(iter);
 }
 
-void Game::AddCollider(class AABBColliderComponent* collider)
+void Game::AddCollider(class AABBColliderComponent *collider)
 {
     mColliders.emplace_back(collider);
 }
 
-void Game::RemoveCollider(AABBColliderComponent* collider)
+void Game::RemoveCollider(AABBColliderComponent *collider)
 {
     auto iter = std::find(mColliders.begin(), mColliders.end(), collider);
     mColliders.erase(iter);
@@ -401,29 +422,33 @@ void Game::GenerateOutput()
     {
         drawable->Draw(mRenderer);
 
-        if(mIsDebugging)
+        if (mIsDebugging)
         {
-           // Call draw for actor components
-              for (auto comp : drawable->GetOwner()->GetComponents())
-              {
+            // Call draw for actor components
+            for (auto comp : drawable->GetOwner()->GetComponents())
+            {
                 comp->DebugDraw(mRenderer);
-              }
+            }
         }
     }
-
+    if (mTerminal)
+        mTerminal->Draw();
     // Swap front buffer and back buffer
     mRenderer->Present();
 }
 
 void Game::Shutdown()
 {
-    while (!mActors.empty()) {
+    while (!mActors.empty())
+    {
         delete mActors.back();
     }
 
     // Delete level data
-    if (mLevelData) {
-        for (int i = 0; i < LEVEL_HEIGHT; ++i) {
+    if (mLevelData)
+    {
+        for (int i = 0; i < LEVEL_HEIGHT; ++i)
+        {
             delete[] mLevelData[i];
         }
         delete[] mLevelData;
@@ -439,4 +464,64 @@ void Game::Shutdown()
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
+}
+
+void Game::ProcessTerminalCommand(const std::string &input)
+{
+    std::string command = input;
+    std::transform(command.begin(), command.end(), command.begin(), ::tolower);
+
+    // Usa stringstream para dividir a linha em tokens (palavra por palavra)
+    std::stringstream ss(command);
+    std::string verb;             // O comando principal (ex: jump, set, get, add)
+    std::string arg1, arg2, arg3; // Argumentos (ex: ACTOR_NAME, ATTRIBUTE, VALUE)
+
+    ss >> verb; // Lê o primeiro token (o comando/verbo)
+
+    if (verb == "jump")
+    {
+        mObjManager->Jump();
+    }
+    else if (verb == "get")
+    {
+        if (ss >> arg1)
+        {
+            std::string attributes = mObjManager->GetObjAttributes(arg1);
+            mTerminal->AddLine(attributes);
+        }
+        else
+        {
+            mTerminal->AddLine("Usage: GET <Object Name>");
+        }
+    }
+    else if (verb == "set")
+    {
+        // Formato: set <NOME_OBJ> <ATRIBUTO> <VALOR>
+        if (ss >> arg1 >> arg2 >> arg3)
+        {
+            // O SetAttributeValue espera o valor na string original
+            // Você precisará da string de valor *original* (sem o toupper)
+            std::string originalValue = input.substr(input.find(arg3.substr(0, 1)));
+
+            mObjManager->SetAttributeValue(arg1, arg2, originalValue);
+        }
+        else
+        {
+            mTerminal->AddLine("Usage: set <Object Name> <Attribute> <Value>");
+        }
+    }
+    else if (verb == "list")
+    {
+        std::vector<std::string_view> names = mObjManager->GetAllObjNames();
+        std::string listStr = "Manageable Objects: ";
+        for (const auto &name : names)
+        {
+            listStr += std::string(name) + " ";
+        }
+        mTerminal->AddLine(listStr);
+    }
+    else
+    {
+        mTerminal->AddLine("Unknown command: " + command);
+    }
 }
