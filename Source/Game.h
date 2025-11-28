@@ -67,6 +67,9 @@ private:
     int **LoadLevel(const std::string &fileName, int width, int height);
     void BuildLevel(int **levelData, int width, int height);
 
+    bool ValidateVector2(const std::string & string);
+    bool ValidateRotation(const std::string & string);
+
     void ProcessTerminalCommand(const std::string &input);
 
     // All the actors in the game

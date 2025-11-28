@@ -83,7 +83,7 @@ bool Game::Initialize()
 void Game::InitializeActors()
 {
     // int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    int **level = LoadLevel("../Assets/Levels/Level1-2/level1-2.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
     BuildLevel(level, Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
 }
 
@@ -225,6 +225,10 @@ void Game::BuildLevel(int **levelData, int width, int height)
                 const Vector2 pos(posX, posY);
                 mCat->SetPosition(pos);
             }
+            case 99:
+                // bloco manageable
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", true, true);
+                break;
             default:
                 break;
             }
@@ -496,17 +500,26 @@ void Game::ProcessTerminalCommand(const std::string &input)
     }
     else if (verb == "set")
     {
-        // Formato: set <NOME_OBJ> <ATRIBUTO> <VALOR>
-        if (ss >> arg1 >> arg2 >> arg3)
-        {
-            // O SetAttributeValue espera o valor na string original
-            // Você precisará da string de valor *original* (sem o toupper)
+        if (ss >> arg1 >> arg2 >> arg3) {
             std::string originalValue = input.substr(input.find(arg3.substr(0, 1)));
-
-            mObjManager->SetAttributeValue(arg1, arg2, originalValue);
-        }
-        else
-        {
+            if (arg2 == "rotation")
+            {
+                if (!ValidateRotation(arg3))
+                {
+                    mTerminal->AddLine("Error: rotation must be a single number. Example: 45");
+                    return;
+                }
+            }
+            else if (arg2 == "scale" || arg2 == "position")
+            {
+                if (!ValidateVector2(arg3))
+                {
+                    mTerminal->AddLine("Error: value must be in format (x,y). Example: (1.0, 2.5)");
+                    return;
+                }
+            }
+            mObjManager->SetAttributeValue(arg1, arg2, arg3);
+        } else  {
             mTerminal->AddLine("Usage: set <Object Name> <Attribute> <Value>");
         }
     }
@@ -524,4 +537,35 @@ void Game::ProcessTerminalCommand(const std::string &input)
     {
         mTerminal->AddLine("Unknown command: " + command);
     }
+}
+
+bool Game::ValidateRotation(const std::string& value)
+{
+    char* end;
+    std::strtod(value.c_str(), &end);
+    return end != value.c_str() && *end == '\0';
+}
+
+bool Game::ValidateVector2(const std::string& value)
+{
+    if (value.size() < 5 || value.front() != '(' || value.back() != ')')
+        return false;
+
+    std::string inside = value.substr(1, value.size() - 2);
+
+    size_t comma = inside.find(',');
+    if (comma == std::string::npos)
+        return false;
+
+    std::string x = inside.substr(0, comma);
+    std::string y = inside.substr(comma + 1);
+
+    auto isNumber = [](const std::string& s)
+    {
+        char* end;
+        std::strtod(s.c_str(), &end);
+        return end != s.c_str() && *end == '\0';
+    };
+
+    return isNumber(x) && isNumber(y);
 }
