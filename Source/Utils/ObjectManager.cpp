@@ -6,6 +6,7 @@
 #include "../Actors/Actor.h"
 #include "../Game.h"
 #include "../Actors/Cat.h"
+#include "../Actors/Block.h"
 #include <vector>
 #include <algorithm>
 
@@ -129,8 +130,9 @@ std::string ObjectManager::AddObject(const Vector2& playerRelativeLocation, cons
     switch (objectToAdd)
     {
         case SpawnableObjects::Block:
-        {
-            // here we would spawn something at spawnPosition and return the spawned obj name
+        { // example spawn
+            Block* newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
+            newBlock->SetPosition(spawnPosition);
             return {};
         }
         default: break;
