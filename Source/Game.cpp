@@ -31,9 +31,21 @@
 #include "Actors/SpawnBlock.h"
 #include "Components/Drawing/AnimatorComponent.h"
 #include "Utils/ObjectManager.h"
+#include "Renderer/Font.h"
 
 Game::Game()
-    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr)
+    : mWindow(nullptr)
+    , mRenderer(nullptr)
+    , mTicksCount(0)
+    , mIsRunning(true)
+    , mIsDebugging(false)
+    , mUpdatingActors(false)
+    , mCameraPos(0.f, 0.f)
+    , mCat(nullptr)
+    , mLevelData(nullptr)
+    , mTerminal(nullptr)
+    , mCurrentScene(GameScene::MainMenu)
+    , mUiFont(nullptr)
 {
 }
 
@@ -69,8 +81,8 @@ bool Game::Initialize()
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    // Init all game actors
-    InitializeActors();
+    mUiFont = new Font();
+    mUiFont->Load("../Assets/Fonts/Arial.ttf");
 
     mTicksCount = SDL_GetTicks();
 
@@ -293,8 +305,18 @@ void Game::ProcessInput()
     if (mTerminal->IsActive())
         return;
 
-    const Uint8 *state = SDL_GetKeyboardState(nullptr);
+    if (mCurrentScene == GameScene::MainMenu)
+    {
+        const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+        if (keys[SDL_SCANCODE_RETURN])
+        {
+            InitializeActors();
+            mCurrentScene = GameScene::Playing;
+        }
+        return;
+    }
 
+    const Uint8 *state = SDL_GetKeyboardState(nullptr);
     for (auto actor : mActors)
     {
         actor->ProcessInput(state);
@@ -303,6 +325,10 @@ void Game::ProcessInput()
 
 void Game::UpdateGame(float deltaTime)
 {
+    if (mCurrentScene == GameScene::MainMenu)
+    {
+        return; // não atualiza nada no menu principal
+    }
     // Update all actors and pending actors
     UpdateActors(deltaTime);
 
@@ -422,21 +448,41 @@ void Game::GenerateOutput()
     // Clear back buffer
     mRenderer->Clear();
 
-    for (auto drawable : mDrawables)
+    if (mCurrentScene == GameScene::MainMenu)
     {
-        drawable->Draw(mRenderer);
-
-        if (mIsDebugging)
+        if (mUiFont)
         {
-            // Call draw for actor components
-            for (auto comp : drawable->GetOwner()->GetComponents())
+            Texture *tex = mUiFont->RenderText("Start Game", Vector3(1,1,1), 28);
+            if (tex)
             {
-                comp->DebugDraw(mRenderer);
+                float w = (float)tex->GetWidth();
+                float h = (float)tex->GetHeight();
+                Vector2 center(Game::WINDOW_WIDTH * 0.5f, Game::WINDOW_HEIGHT * 0.5f);
+                mRenderer->DrawTexture(center, Vector2(w, h), 0.0f,
+                                       Vector3(1,1,1), tex, Vector4(0,0,1,1), Vector2::Zero, false, 1.0f);
+                tex->Unload();
+                delete tex;
             }
         }
     }
-    if (mTerminal)
-        mTerminal->Draw();
+    else
+    {
+        for (auto drawable : mDrawables)
+        {
+            drawable->Draw(mRenderer);
+
+            if (mIsDebugging)
+            {
+                for (auto comp : drawable->GetOwner()->GetComponents())
+                {
+                    comp->DebugDraw(mRenderer);
+                }
+            }
+        }
+        if (mTerminal)
+            mTerminal->Draw();
+    }
+
     // Swap front buffer and back buffer
     mRenderer->Present();
 }
