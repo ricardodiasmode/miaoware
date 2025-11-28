@@ -10,61 +10,11 @@ find_package(SDL2_ttf REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 
-set(SOURCES
-        Source/Renderer/Shader.cpp
-        Source/Renderer/Shader.h
-        Source/Main.cpp
-        Source/Math.cpp
-        Source/Math.h
-        Source/Random.cpp
-        Source/Random.h
-        Source/Game.cpp
-        Source/Game.h
-        Source/Actors/Actor.cpp
-        Source/Actors/Actor.h
-        Source/Components/Component.cpp
-        Source/Components/Component.h
-        Source/Components/Drawing/DrawComponent.cpp
-        Source/Components/Drawing/DrawComponent.h
-        Source/Components/Physics/RigidBodyComponent.cpp
-        Source/Components/Physics/RigidBodyComponent.h
-        Source/Components/Physics/AABBColliderComponent.cpp
-        Source/Components/Physics/AABBColliderComponent.h
-        Source/Components/ParticleSystemComponent.cpp
-        Source/Components/ParticleSystemComponent.h
-        Source/Renderer/Renderer.cpp
-        Source/Renderer/Renderer.h
-        Source/Renderer/VertexArray.h
-        Source/Renderer/VertexArray.cpp
-        Source/Renderer/Texture.cpp
-        Source/Renderer/Texture.h
-        Source/Actors/Block.cpp
-        Source/Actors/Block.h
-        Source/Actors/Goomba.cpp
-        Source/Actors/Goomba.h
-        Source/Actors/Spawner.cpp
-        Source/Actors/Spawner.h
-        Source/Actors/Cat.cpp
-        Source/Actors/Cat.h
-        Source/Components/Drawing/AnimatorComponent.cpp
-        Source/Components/Drawing/AnimatorComponent.h
-        Source/Components/Drawing/RectComponent.cpp
-        Source/Components/Drawing/RectComponent.h
-        Source/Actors/Background.cpp
-        Source/Actors/Background.h
-        Source/Components/Drawing/TextureComponent.cpp
-        Source/Components/Drawing/TextureComponent.h
-        Source/Actors/MovingBlock.cpp
-        Source/Actors/MovingBlock.h
-        Source/Actors/SpawnBlock.cpp
-        Source/Actors/SpawnBlock.h
-        Source/Actors/Mushroom.cpp
-        Source/Actors/Mushroom.h
-        Source/Utils/ObjectManager.cpp
-        Source/Utils/ObjectManager.h
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/Source/*.cpp"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 if(APPLE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
@@ -92,7 +42,6 @@ endif()
 if (TARGET SDL2_ttf::SDL2_ttf)
     target_link_libraries(${PROJECT_NAME} PRIVATE SDL2_ttf::SDL2_ttf)
 elseif (DEFINED SDL2_TTF_LIBRARIES OR DEFINED SDL2_TTF_LIBRARY)
-    # Some Find modules export *_LIBRARIES or *_LIBRARY
     if (DEFINED SDL2_TTF_INCLUDE_DIRS)
         target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
     elseif(DEFINED SDL2_TTF_INCLUDE_DIR)
