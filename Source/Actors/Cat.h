@@ -37,6 +37,7 @@ private:
     bool mIsRunning;
     bool mIsDead;
     bool mIsBig;
+    bool mWalkingSfxPlaying = false;
 
     int mDirection;
     bool mAutoWalk;

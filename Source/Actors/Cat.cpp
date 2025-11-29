@@ -10,6 +10,7 @@
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 #include "../Components/ParticleSystemComponent.h"
+#include "../AudioSystem.h"
 
 Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, const float jumpSpeed)
         : Actor(game, uniqueName)
@@ -131,6 +132,26 @@ void Cat::OnUpdate(float deltaTime)
         mIsOnGround = false;
 
     ManageAnimations();
+
+    // Walking SFX: loop while running on ground; stop/reset otherwise
+    if (mGame && mGame->mAudio)
+    {
+        if (mIsRunning && mIsOnGround)
+        {
+            if (!mWalkingSfxPlaying)
+            {
+                SDL_Log("[Cat] Start walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
+                mGame->mAudio->PlaySound("Cat/Walking.wav", true);
+                mWalkingSfxPlaying = true;
+            }
+        }
+        else if (mWalkingSfxPlaying)
+        {
+            SDL_Log("[Cat] Stop walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
+            mGame->mAudio->StopSound("Cat/Walking.wav");
+            mWalkingSfxPlaying = false;
+        }
+    }
 }
 
 void Cat::ManageAnimations()

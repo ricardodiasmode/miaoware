@@ -82,6 +82,10 @@ void AudioSystem::PlaySound(const std::string& soundName, bool looping)
     Mix_Chunk* chunk = LoadChunk(soundName);
     if (!chunk) return;
 
+    // Ensure audible volume (can be adjusted per needs)
+    Mix_Volume(-1, MIX_MAX_VOLUME);
+    Mix_VolumeChunk(chunk, MIX_MAX_VOLUME);
+
     int loops = looping ? -1 : 0;
     int ch = Mix_PlayChannel(-1, chunk, loops);
     if (ch == -1)
@@ -93,6 +97,10 @@ void AudioSystem::PlaySound(const std::string& soundName, bool looping)
             SDL_Log("Failed to play sound '%s': %s", soundName.c_str(), Mix_GetError());
         }
     }
+    else
+    {
+        SDL_Log("[Audio] Playing '%s' on channel %d (loops=%d)", soundName.c_str(), ch, loops);
+    }
 }
 
 void AudioSystem::StopSound(const std::string& /*soundName*/)
@@ -101,6 +109,7 @@ void AudioSystem::StopSound(const std::string& /*soundName*/)
     {
         Mix_HaltChannel(i);
     }
+    SDL_Log("[Audio] Stop all channels");
 }
 
 void AudioSystem::PauseSound(const std::string& /*soundName*/)
