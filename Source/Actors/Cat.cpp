@@ -65,6 +65,12 @@ void Cat::Jump()
     Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
     newVelocity.y = mJumpSpeed;
     mRigidBodyComponent->SetVelocity(newVelocity);
+
+    if (mGame && mGame->mAudio)
+    {
+        mGame->mAudio->PlaySound("Cat/Jump.wav", false);
+        mGame->mAudio->SetVolume("Cat/Jump.wav", 96);
+    }
 }
 
 void Cat::OnProcessInput(const uint8_t* state)
@@ -183,6 +189,8 @@ void Cat::Kill()
     {
         mGame->mAudio->StopSound("Levels/BackgroundMusic.wav");
         mGame->mAudio->StopSound("Cat/Walking.wav");
+        mGame->mAudio->PlaySound("MainMenu/Screaming.wav", false);
+        mGame->mAudio->SetVolume("MainMenu/Screaming.wav", 96);
     }
 }
 
