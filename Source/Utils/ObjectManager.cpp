@@ -6,6 +6,7 @@
 #include "../Actors/Actor.h"
 #include "../Game.h"
 #include "../Actors/Cat.h"
+#include "../Actors/Block.h"
 #include <vector>
 #include <algorithm>
 
@@ -14,14 +15,16 @@ ObjectManager::ObjectManager(Game *game) : mGame(game)
 
 }
 
-Actor * ObjectManager::GetActorByName(const std::string &actorName) const
+Actor * ObjectManager::GetActorByName(std::string actorName) const
 {
     std::vector<Actor*> allActors = mGame->GetAllActors();
     for (Actor* actor : allActors)
     {
-        if (actor->mIsManageable) {
+        if (actor->mIsManageable)
+        {
             std::string actorNameStr = actor->GetActorName();
             std::transform(actorNameStr.begin(), actorNameStr.end(), actorNameStr.begin(), ::tolower);
+            std::transform(actorName.begin(), actorName.end(), actorName.begin(), ::tolower);
             if (actorNameStr == actorName)
                 return actor;
         }
@@ -49,7 +52,7 @@ std::string ObjectManager::GetObjAttributes(const std::string& objName)
     Actor* desiredActor = GetActorByName(objName);
     if (!desiredActor)
     {
-        SDL_LogError(0, "ObjectManager::GetObjAttributes called with wrong obj name.");
+        SDL_LogError(0, "ObjectManager::GetObjAttributes called with wrong obj name: %s.", objName.c_str());
         return {"none"};
     }
 
@@ -68,7 +71,7 @@ void ObjectManager::SetAttributeValue(const std::string& objName, const std::str
     Actor* actorToModify = GetActorByName(objName);
     if (!actorToModify)
     {
-        SDL_LogError(0, "ObjectManager::SetAttributeValue called with wrong obj name.");
+        SDL_LogError(0, "ObjectManager::SetAttributeValue called with wrong obj name: %s.", objName.c_str());
         return;
     }
 
@@ -127,8 +130,9 @@ std::string ObjectManager::AddObject(const Vector2& playerRelativeLocation, cons
     switch (objectToAdd)
     {
         case SpawnableObjects::Block:
-        {
-            // here we would spawn something at spawnPosition and return the spawned obj name
+        { // example spawn
+            Block* newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
+            newBlock->SetPosition(spawnPosition);
             return {};
         }
         default: break;

@@ -24,12 +24,11 @@
 #include "Actors/Background.h"
 #include "Actors/Block.h"
 #include "Actors/MovingBlock.h"
-#include "Actors/Goomba.h"
 #include "Actors/Spawner.h"
 #include "Actors/Cat.h"
 #include "Actors/Mushroom.h"
 #include "Actors/SpawnBlock.h"
-#include "Components/Drawing/AnimatorComponent.h"
+#include "Utils/DialogManager.h"
 #include "Utils/ObjectManager.h"
 #include "Renderer/Font.h"
 #include "AudioSystem.h"
@@ -96,6 +95,7 @@ bool Game::Initialize()
 
     mObjManager = new ObjectManager(this);
     mTerminal = new Terminal(mRenderer);
+    mDialogManager = new DialogManager(mTerminal);
 
     return true;
 }
