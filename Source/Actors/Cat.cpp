@@ -131,7 +131,8 @@ void Cat::OnUpdate(float deltaTime)
     }
     if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
     {
-        Kill();
+        if (!mIsDead)
+            Kill();
     }
 
     if (mRigidBodyComponent->GetVelocity().y != 0)
@@ -177,6 +178,8 @@ void Cat::ManageAnimations()
 
 void Cat::Kill()
 {
+    if (mIsDead)
+        return;
     DecreaseSize();
 
     mDrawComponent->SetAnimation("dead");
