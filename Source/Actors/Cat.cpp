@@ -26,16 +26,15 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
         "../Assets/Sprites/Cat/Cat.json",
         Game::TILE_SIZE,
         Game::TILE_SIZE);
-    // Cat sprites: idle single frame, jump has 8 frames (1-8)
     mDrawComponent->AddAnimation("idle", {0});
-    mDrawComponent->AddAnimation("jump", {1,2,3,4,5,6,7,8});
-    mDrawComponent->SetAnimFPS(6.f);
+    mDrawComponent->AddAnimation("jump", {2,4,5,1,6,9,3,7});
+    mDrawComponent->AddAnimation("run", {10,16,18,14,19,20,21,22}); // Select a smooth subset for looping
+    mDrawComponent->SetAnimFPS(6.f); // base (jump speed)
 
     // Big/super variant not used for Cat assets; disable big component path
     mDrawComponentBig = nullptr;
 
     mDrawComponent->SetAnimation("idle");
-    mDrawComponent->SetAnimFPS(10.f);
 
     mRigidBodyComponent = new RigidBodyComponent(this, 1.f, 5.f);
 
@@ -156,11 +155,20 @@ void Cat::ManageAnimations()
 
     if (mIsOnGround)
     {
-        // With current Cat assets, use idle for ground state.
-        mDrawComponent->SetAnimation(mIsRunning ? "idle" : "idle");
+        if (mIsRunning)
+        {
+            mDrawComponent->SetAnimFPS(10.f);
+            mDrawComponent->SetAnimation("run");
+        }
+        else
+        {
+            mDrawComponent->SetAnimFPS(4.f);
+            mDrawComponent->SetAnimation("idle");
+        }
     }
     else
     {
+        mDrawComponent->SetAnimFPS(6.f);
         mDrawComponent->SetAnimation("jump");
     }
 }
@@ -187,9 +195,7 @@ void Cat::Kill()
 
 void Cat::EatMushroomEffect()
 {
-    // Big variant not supported for Cat assets currently
     mIsBig = true;
-    // keep using the same draw component; no collider resize
 }
 
 void Cat::DecreaseSize()
@@ -198,7 +204,6 @@ void Cat::DecreaseSize()
         return;
 
     mIsBig = false;
-    // no changes needed for Cat assets
 }
 
 void Cat::EnemyHit(AABBColliderComponent *other)
