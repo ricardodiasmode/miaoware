@@ -166,7 +166,7 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-    auto *bg = new Background(this, "Background", "../Assets/Sprites/Background.png");
+    auto *bg = new Background(this, "Background", "../Assets/Sprites/Background.jpg");
     bg->SetPosition(Vector2(3408, 210));
 
     // Percorre a matriz de tiles

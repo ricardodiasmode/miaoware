@@ -22,31 +22,19 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
         , mAutoWalk(true)
 {
     mDrawComponent = new AnimatorComponent(this,
-        "../Assets/Sprites/Mario/Mario.png",
-        "../Assets/Sprites/Mario/Mario.json",
+        "../Assets/Sprites/Cat/Cat.png",
+        "../Assets/Sprites/Cat/Cat.json",
         Game::TILE_SIZE,
         Game::TILE_SIZE);
-    mDrawComponent->AddAnimation("idle", {1});
-    mDrawComponent->AddAnimation("jump", {2});
-    mDrawComponent->AddAnimation("run", {3, 4, 5});
-    mDrawComponent->AddAnimation("dead", {0});
+    mDrawComponent->AddAnimation("idle", {0});
+    mDrawComponent->AddAnimation("jump", {2,4,5,1,6,9,3,7});
+    mDrawComponent->AddAnimation("run", {10,16,18,14,19,20,21,22}); // Select a smooth subset for looping
+    mDrawComponent->SetAnimFPS(6.f); // base (jump speed)
 
-    mDrawComponentBig = new AnimatorComponent(this,
-        "../Assets/Sprites/SuperMario/SuperMario.png",
-        "../Assets/Sprites/SuperMario/SuperMario.json",
-        Game::TILE_SIZE,
-        Game::TILE_SIZE*2,
-        0.f,
-        16.f);
-    mDrawComponentBig->AddAnimation("idle", {0});
-    mDrawComponentBig->AddAnimation("jump", {2});
-    mDrawComponentBig->AddAnimation("run", {6, 7, 8});   // RunLeft0, RunLeft1, RunLeft2
-    mDrawComponentBig->SetAnimFPS(10.f);
-    mDrawComponentBig->SetEnabled(false);
-    mDrawComponentBig->SetVisible(false);
+    // Big/super variant not used for Cat assets; disable big component path
+    mDrawComponentBig = nullptr;
 
     mDrawComponent->SetAnimation("idle");
-    mDrawComponent->SetAnimFPS(10.f);
 
     mRigidBodyComponent = new RigidBodyComponent(this, 1.f, 5.f);
 
@@ -168,12 +156,21 @@ void Cat::ManageAnimations()
     if (mIsOnGround)
     {
         if (mIsRunning)
-            (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("run");
+        {
+            mDrawComponent->SetAnimFPS(10.f);
+            mDrawComponent->SetAnimation("run");
+        }
         else
-            (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("idle");
+        {
+            mDrawComponent->SetAnimFPS(4.f);
+            mDrawComponent->SetAnimation("idle");
+        }
     }
     else
-        (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("jump");
+    {
+        mDrawComponent->SetAnimFPS(6.f);
+        mDrawComponent->SetAnimation("jump");
+    }
 }
 
 void Cat::Kill()
@@ -199,12 +196,6 @@ void Cat::Kill()
 void Cat::EatMushroomEffect()
 {
     mIsBig = true;
-    mDrawComponent->SetEnabled(false);
-    mDrawComponent->SetVisible(false);
-    mDrawComponentBig->SetEnabled(true);
-    mDrawComponentBig->SetVisible(true);
-    constexpr Vector2 newOffset(0, 0);
-    mColliderComponent->Resize(32, 64, newOffset);
 }
 
 void Cat::DecreaseSize()
@@ -213,13 +204,6 @@ void Cat::DecreaseSize()
         return;
 
     mIsBig = false;
-    mDrawComponent->SetEnabled(true);
-    mDrawComponent->SetVisible(true);
-    mDrawComponentBig->SetEnabled(false);
-    mDrawComponentBig->SetVisible(false);
-
-    constexpr Vector2 newOffset(0, 0);
-    mColliderComponent->Resize(32, 32, newOffset);
 }
 
 void Cat::EnemyHit(AABBColliderComponent *other)
