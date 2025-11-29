@@ -131,7 +131,7 @@ void MainMenu::StartGame()
 {
     if (mGame->mAudio)
     {
-        mGame->mAudio->PlaySound("MainMenuMeow.mp3", false);
+        mGame->mAudio->PlaySound("MainMenu/Meow.mp3", false);
     }
     mGame->InitializeActors();
     mGame->mCurrentScene = Game::GameScene::Playing;
