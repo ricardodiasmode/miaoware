@@ -10,6 +10,7 @@
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 #include "../Components/ParticleSystemComponent.h"
+#include "../AudioSystem.h"
 
 Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, const float jumpSpeed)
         : Actor(game, uniqueName)
@@ -64,6 +65,12 @@ void Cat::Jump()
     Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
     newVelocity.y = mJumpSpeed;
     mRigidBodyComponent->SetVelocity(newVelocity);
+
+    if (mGame && mGame->mAudio)
+    {
+        mGame->mAudio->PlaySound("Cat/Jump.wav", false);
+        mGame->mAudio->SetVolume("Cat/Jump.wav", 96);
+    }
 }
 
 void Cat::OnProcessInput(const uint8_t* state)
@@ -124,13 +131,33 @@ void Cat::OnUpdate(float deltaTime)
     }
     if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
     {
-        Kill();
+        if (!mIsDead)
+            Kill();
     }
 
     if (mRigidBodyComponent->GetVelocity().y != 0)
         mIsOnGround = false;
 
     ManageAnimations();
+
+    if (mGame && mGame->mAudio)
+    {
+        if (mIsRunning && mIsOnGround)
+        {
+            if (!mWalkingSfxPlaying)
+            {
+                SDL_Log("[Cat] Start walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
+                mGame->mAudio->PlaySound("Cat/Walking.wav", true);
+                mWalkingSfxPlaying = true;
+            }
+        }
+        else if (mWalkingSfxPlaying)
+        {
+            SDL_Log("[Cat] Stop walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
+            mGame->mAudio->StopSound("Cat/Walking.wav");
+            mWalkingSfxPlaying = false;
+        }
+    }
 }
 
 void Cat::ManageAnimations()
@@ -151,12 +178,22 @@ void Cat::ManageAnimations()
 
 void Cat::Kill()
 {
+    if (mIsDead)
+        return;
     DecreaseSize();
 
     mDrawComponent->SetAnimation("dead");
     mIsDead = true;
     mRigidBodyComponent->SetEnabled(false);
     mColliderComponent->SetEnabled(false);
+
+    if (mGame && mGame->mAudio)
+    {
+        mGame->mAudio->StopSound("Levels/BackgroundMusic.wav");
+        mGame->mAudio->StopSound("Cat/Walking.wav");
+        mGame->mAudio->PlaySound("MainMenu/Screaming.wav", false);
+        mGame->mAudio->SetVolume("MainMenu/Screaming.wav", 96);
+    }
 }
 
 void Cat::EatMushroomEffect()

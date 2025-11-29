@@ -16,6 +16,7 @@ public:
     void StopSound(const std::string& soundName);
     void PauseSound(const std::string& soundName);
     void ResumeSound(const std::string& soundName);
+    void SetVolume(const std::string& soundName, int volume /*0-128*/);
 
 private:
     Mix_Chunk* LoadChunk(const std::string& soundName);

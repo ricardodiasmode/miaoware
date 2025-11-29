@@ -8,6 +8,12 @@
 MainMenu::MainMenu(Game* game, Font* font)
     : mGame(game), mFont(font), mSelected(0)
 {
+    if (mGame->mAudio && !mMenuMusicPlaying)
+    {
+        mGame->mAudio->PlaySound("MainMenu/Jazz.mp3", true);
+        mGame->mAudio->SetVolume("MainMenu/Jazz.mp3", 48);
+        mMenuMusicPlaying = true;
+    }
 }
 
 void MainMenu::HandleEvent(const SDL_Event& ev)
@@ -29,6 +35,11 @@ void MainMenu::HandleEvent(const SDL_Event& ev)
         }
         else if (k == SDLK_q)
         {
+            if (mGame->mAudio && mMenuMusicPlaying)
+            {
+                mGame->mAudio->StopSound("MainMenu/Jazz.mp3");
+                mMenuMusicPlaying = false;
+            }
             mGame->Quit();
         }
     }
@@ -70,17 +81,7 @@ void MainMenu::Draw(bool debug)
 
     if (mFont)
     {
-        Texture *tex = mFont->RenderText("Compartilhar", Vector3(1,1,1), 28);
-        if (tex)
-        {
-            float w = (float)tex->GetWidth();
-            float h = (float)tex->GetHeight();
-            Vector2 center(Game::WINDOW_WIDTH * 0.5f, Game::WINDOW_HEIGHT * 0.5f);
-            r->DrawTexture(center, Vector2(w, h), 0.0f,
-                           Vector3(1,1,1), tex, Vector4(0,0,1,1), Vector2::Zero, false, 1.0f);
-            tex->Unload();
-            delete tex;
-        }
+        // Legado caso queira desenhar texto no menu
     }
 
     const float thickness = 3.0f;
@@ -129,10 +130,22 @@ void MainMenu::Draw(bool debug)
 
 void MainMenu::StartGame()
 {
+    if (mGame->mAudio && mMenuMusicPlaying)
+    {
+        mGame->mAudio->StopSound("MainMenu/Jazz.mp3");
+        mMenuMusicPlaying = false;
+    }
     if (mGame->mAudio)
     {
-        mGame->mAudio->PlaySound("MainMenuMeow.mp3", false);
+        mGame->mAudio->PlaySound("MainMenu/Meow.mp3", false);
+        mGame->mAudio->SetVolume("MainMenu/Meow.mp3", 10);
     }
     mGame->InitializeActors();
     mGame->mCurrentScene = Game::GameScene::Playing;
+
+    if (mGame->mAudio)
+    {
+        mGame->mAudio->PlaySound("Levels/BackgroundMusic.wav", true);
+        mGame->mAudio->SetVolume("Levels/BackgroundMusic.wav", 48);
+    }
 }

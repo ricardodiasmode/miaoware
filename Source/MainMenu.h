@@ -21,6 +21,7 @@ private:
     Game* mGame;
     Font* mFont;
     int mSelected = 0; // 0 = Start, 1 = Exit
+     bool mMenuMusicPlaying = false;
 
     const float mMinX = 446.0f;
     const float mMaxX = 558.0f;
