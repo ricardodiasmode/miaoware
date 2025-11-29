@@ -142,4 +142,10 @@ void MainMenu::StartGame()
     }
     mGame->InitializeActors();
     mGame->mCurrentScene = Game::GameScene::Playing;
+
+    if (mGame->mAudio)
+    {
+        mGame->mAudio->PlaySound("Levels/BackgroundMusic.wav", true);
+        mGame->mAudio->SetVolume("Levels/BackgroundMusic.wav", 48);
+    }
 }

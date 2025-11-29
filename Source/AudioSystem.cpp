@@ -111,27 +111,50 @@ void AudioSystem::SetVolume(const std::string& soundName, int volume)
     Mix_VolumeChunk(chunk, v);
 }
 
-void AudioSystem::StopSound(const std::string& /*soundName*/)
+void AudioSystem::StopSound(const std::string& soundName)
 {
+    Mix_Chunk* chunk = LoadChunk(soundName);
+    if (!chunk) return;
+    int stopped = 0;
     for (int i = 0; i < mNumChannels; ++i)
     {
-        Mix_HaltChannel(i);
+        if (Mix_Playing(i) && Mix_GetChunk(i) == chunk)
+        {
+            Mix_HaltChannel(i);
+            ++stopped;
+        }
     }
-    SDL_Log("[Audio] Stop all channels");
+    SDL_Log("[Audio] Stop '%s' on %d channel(s)", soundName.c_str(), stopped);
 }
 
-void AudioSystem::PauseSound(const std::string& /*soundName*/)
+void AudioSystem::PauseSound(const std::string& soundName)
 {
+    Mix_Chunk* chunk = LoadChunk(soundName);
+    if (!chunk) return;
+    int paused = 0;
     for (int i = 0; i < mNumChannels; ++i)
     {
-        if (Mix_Playing(i)) Mix_Pause(i);
+        if (Mix_Playing(i) && Mix_GetChunk(i) == chunk)
+        {
+            Mix_Pause(i);
+            ++paused;
+        }
     }
+    SDL_Log("[Audio] Pause '%s' on %d channel(s)", soundName.c_str(), paused);
 }
 
-void AudioSystem::ResumeSound(const std::string& /*soundName*/)
+void AudioSystem::ResumeSound(const std::string& soundName)
 {
+    Mix_Chunk* chunk = LoadChunk(soundName);
+    if (!chunk) return;
+    int resumed = 0;
     for (int i = 0; i < mNumChannels; ++i)
     {
-        Mix_Resume(i);
+        if (Mix_Paused(i) && Mix_GetChunk(i) == chunk)
+        {
+            Mix_Resume(i);
+            ++resumed;
+        }
     }
+    SDL_Log("[Audio] Resume '%s' on %d channel(s)", soundName.c_str(), resumed);
 }

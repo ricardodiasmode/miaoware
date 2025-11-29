@@ -178,6 +178,12 @@ void Cat::Kill()
     mIsDead = true;
     mRigidBodyComponent->SetEnabled(false);
     mColliderComponent->SetEnabled(false);
+
+    if (mGame && mGame->mAudio)
+    {
+        mGame->mAudio->StopSound("Levels/BackgroundMusic.wav");
+        mGame->mAudio->StopSound("Cat/Walking.wav");
+    }
 }
 
 void Cat::EatMushroomEffect()
