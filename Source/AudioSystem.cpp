@@ -82,8 +82,6 @@ void AudioSystem::PlaySound(const std::string& soundName, bool looping)
     Mix_Chunk* chunk = LoadChunk(soundName);
     if (!chunk) return;
 
-    // Ensure audible volume (can be adjusted per needs)
-    Mix_Volume(-1, MIX_MAX_VOLUME);
     Mix_VolumeChunk(chunk, MIX_MAX_VOLUME);
 
     int loops = looping ? -1 : 0;
@@ -101,6 +99,16 @@ void AudioSystem::PlaySound(const std::string& soundName, bool looping)
     {
         SDL_Log("[Audio] Playing '%s' on channel %d (loops=%d)", soundName.c_str(), ch, loops);
     }
+}
+
+void AudioSystem::SetVolume(const std::string& soundName, int volume)
+{
+    Mix_Chunk* chunk = LoadChunk(soundName);
+    if (!chunk) return;
+    int v = volume;
+    if (v < 0) v = 0;
+    if (v > MIX_MAX_VOLUME) v = MIX_MAX_VOLUME;
+    Mix_VolumeChunk(chunk, v);
 }
 
 void AudioSystem::StopSound(const std::string& /*soundName*/)

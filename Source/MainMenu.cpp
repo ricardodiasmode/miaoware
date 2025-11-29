@@ -8,6 +8,12 @@
 MainMenu::MainMenu(Game* game, Font* font)
     : mGame(game), mFont(font), mSelected(0)
 {
+    if (mGame->mAudio && !mMenuMusicPlaying)
+    {
+        mGame->mAudio->PlaySound("MainMenu/Jazz.mp3", true);
+        mGame->mAudio->SetVolume("MainMenu/Jazz.mp3", 48);
+        mMenuMusicPlaying = true;
+    }
 }
 
 void MainMenu::HandleEvent(const SDL_Event& ev)
@@ -29,6 +35,11 @@ void MainMenu::HandleEvent(const SDL_Event& ev)
         }
         else if (k == SDLK_q)
         {
+            if (mGame->mAudio && mMenuMusicPlaying)
+            {
+                mGame->mAudio->StopSound("MainMenu/Jazz.mp3");
+                mMenuMusicPlaying = false;
+            }
             mGame->Quit();
         }
     }
@@ -129,6 +140,11 @@ void MainMenu::Draw(bool debug)
 
 void MainMenu::StartGame()
 {
+    if (mGame->mAudio && mMenuMusicPlaying)
+    {
+        mGame->mAudio->StopSound("MainMenu/Jazz.mp3");
+        mMenuMusicPlaying = false;
+    }
     if (mGame->mAudio)
     {
         mGame->mAudio->PlaySound("MainMenu/Meow.mp3", false);
