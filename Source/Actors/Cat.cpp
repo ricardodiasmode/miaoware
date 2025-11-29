@@ -22,28 +22,17 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
         , mAutoWalk(true)
 {
     mDrawComponent = new AnimatorComponent(this,
-        "../Assets/Sprites/Mario/Mario.png",
-        "../Assets/Sprites/Mario/Mario.json",
+        "../Assets/Sprites/Cat/Cat.png",
+        "../Assets/Sprites/Cat/Cat.json",
         Game::TILE_SIZE,
         Game::TILE_SIZE);
-    mDrawComponent->AddAnimation("idle", {1});
-    mDrawComponent->AddAnimation("jump", {2});
-    mDrawComponent->AddAnimation("run", {3, 4, 5});
-    mDrawComponent->AddAnimation("dead", {0});
+    // Cat sprites: idle single frame, jump has 8 frames (1-8)
+    mDrawComponent->AddAnimation("idle", {0});
+    mDrawComponent->AddAnimation("jump", {1,2,3,4,5,6,7,8});
+    mDrawComponent->SetAnimFPS(6.f);
 
-    mDrawComponentBig = new AnimatorComponent(this,
-        "../Assets/Sprites/SuperMario/SuperMario.png",
-        "../Assets/Sprites/SuperMario/SuperMario.json",
-        Game::TILE_SIZE,
-        Game::TILE_SIZE*2,
-        0.f,
-        16.f);
-    mDrawComponentBig->AddAnimation("idle", {0});
-    mDrawComponentBig->AddAnimation("jump", {2});
-    mDrawComponentBig->AddAnimation("run", {6, 7, 8});   // RunLeft0, RunLeft1, RunLeft2
-    mDrawComponentBig->SetAnimFPS(10.f);
-    mDrawComponentBig->SetEnabled(false);
-    mDrawComponentBig->SetVisible(false);
+    // Big/super variant not used for Cat assets; disable big component path
+    mDrawComponentBig = nullptr;
 
     mDrawComponent->SetAnimation("idle");
     mDrawComponent->SetAnimFPS(10.f);
@@ -167,13 +156,13 @@ void Cat::ManageAnimations()
 
     if (mIsOnGround)
     {
-        if (mIsRunning)
-            (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("run");
-        else
-            (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("idle");
+        // With current Cat assets, use idle for ground state.
+        mDrawComponent->SetAnimation(mIsRunning ? "idle" : "idle");
     }
     else
-        (mIsBig ? mDrawComponentBig : mDrawComponent)->SetAnimation("jump");
+    {
+        mDrawComponent->SetAnimation("jump");
+    }
 }
 
 void Cat::Kill()
@@ -198,13 +187,9 @@ void Cat::Kill()
 
 void Cat::EatMushroomEffect()
 {
+    // Big variant not supported for Cat assets currently
     mIsBig = true;
-    mDrawComponent->SetEnabled(false);
-    mDrawComponent->SetVisible(false);
-    mDrawComponentBig->SetEnabled(true);
-    mDrawComponentBig->SetVisible(true);
-    constexpr Vector2 newOffset(0, 0);
-    mColliderComponent->Resize(32, 64, newOffset);
+    // keep using the same draw component; no collider resize
 }
 
 void Cat::DecreaseSize()
@@ -213,13 +198,7 @@ void Cat::DecreaseSize()
         return;
 
     mIsBig = false;
-    mDrawComponent->SetEnabled(true);
-    mDrawComponent->SetVisible(true);
-    mDrawComponentBig->SetEnabled(false);
-    mDrawComponentBig->SetVisible(false);
-
-    constexpr Vector2 newOffset(0, 0);
-    mColliderComponent->Resize(32, 32, newOffset);
+    // no changes needed for Cat assets
 }
 
 void Cat::EnemyHit(AABBColliderComponent *other)
