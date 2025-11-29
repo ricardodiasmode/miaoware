@@ -5,6 +5,7 @@
 #include "ObjectManager.h"
 #include "../Actors/Actor.h"
 #include "../Game.h"
+#include "../Terminal.h"
 #include "../Actors/Cat.h"
 #include "../Actors/Block.h"
 #include <vector>
@@ -12,13 +13,12 @@
 
 ObjectManager::ObjectManager(Game *game) : mGame(game)
 {
-
 }
 
-Actor * ObjectManager::GetActorByName(std::string actorName) const
+Actor *ObjectManager::GetActorByName(std::string actorName) const
 {
-    std::vector<Actor*> allActors = mGame->GetAllActors();
-    for (Actor* actor : allActors)
+    std::vector<Actor *> allActors = mGame->GetAllActors();
+    for (Actor *actor : allActors)
     {
         if (actor->mIsManageable)
         {
@@ -34,9 +34,9 @@ Actor * ObjectManager::GetActorByName(std::string actorName) const
 
 std::vector<std::string_view> ObjectManager::GetAllObjNames() const
 {
-    std::vector<Actor*> allActors = mGame->GetAllActors();
+    std::vector<Actor *> allActors = mGame->GetAllActors();
     std::vector<std::string_view> objNames;
-    for (Actor* actor : allActors)
+    for (Actor *actor : allActors)
     {
         if (actor->mIsManageable)
         {
@@ -47,9 +47,9 @@ std::vector<std::string_view> ObjectManager::GetAllObjNames() const
     return objNames;
 }
 
-std::string ObjectManager::GetObjAttributes(const std::string& objName)
+std::string ObjectManager::GetObjAttributes(const std::string &objName)
 {
-    Actor* desiredActor = GetActorByName(objName);
+    Actor *desiredActor = GetActorByName(objName);
     if (!desiredActor)
     {
         SDL_LogError(0, "ObjectManager::GetObjAttributes called with wrong obj name: %s.", objName.c_str());
@@ -61,14 +61,14 @@ std::string ObjectManager::GetObjAttributes(const std::string& objName)
     std::string objScale = "scale: (" + std::to_string(desiredActor->GetScale().x) + "," + std::to_string(desiredActor->GetScale().y) + ")";
 
     // todo
-    //std::string objDamage = "damage: " + desiredActor->GetDamage();
+    // std::string objDamage = "damage: " + desiredActor->GetDamage();
 
     return objLocation + "\n" + objRotation + "\n" + objScale;
 }
 
-void ObjectManager::SetAttributeValue(const std::string& objName, const std::string& attributeName, const std::string& value)
+void ObjectManager::SetAttributeValue(const std::string &objName, const std::string &attributeName, const std::string &value)
 {
-    Actor* actorToModify = GetActorByName(objName);
+    Actor *actorToModify = GetActorByName(objName);
     if (!actorToModify)
     {
         SDL_LogError(0, "ObjectManager::SetAttributeValue called with wrong obj name: %s.", objName.c_str());
@@ -82,7 +82,21 @@ void ObjectManager::SetAttributeValue(const std::string& objName, const std::str
         auto comma = inner.find(',');
         const int x = std::stoi(inner.substr(0, comma));
         const int y = std::stoi(inner.substr(comma + 1));
-        const Vector2 newPos(x, y);
+        // Verifica se a posição solicitada está dentro dos limites visíveis pela câmera
+        Vector2 cam = mGame->GetCameraPos();
+        float camLeft = cam.x;
+        float camTop = cam.y;
+        float camRight = camLeft + Game::WINDOW_WIDTH;
+        float camBottom = camTop + Game::WINDOW_HEIGHT;
+
+        if (x < camLeft || x > camRight || y < camTop || y > camBottom)
+        {
+            mGame->GetTerminal()->AddLine("Error: Requested position is outside camera bounds.");
+            SDL_Log("ObjectManager: requested position (%d,%d) is outside camera bounds; change ignored", x, y);
+            return;
+        }
+
+        const Vector2 newPos(static_cast<float>(x), static_cast<float>(y));
         SDL_Log("setting obj position to: %d, %d", x, y);
         actorToModify->SetPosition(newPos);
         return;
@@ -111,9 +125,9 @@ void ObjectManager::Jump()
     mGame->GetPlayer()->Jump();
 }
 
-void ObjectManager::DeleteObject(const std::string& objName)
+void ObjectManager::DeleteObject(const std::string &objName)
 {
-    Actor* actorToDelete = GetActorByName(objName);
+    Actor *actorToDelete = GetActorByName(objName);
     if (!actorToDelete)
     {
         SDL_LogError(0, "ObjectManager::DeleteObject called with wrong obj name.");
@@ -123,19 +137,20 @@ void ObjectManager::DeleteObject(const std::string& objName)
     actorToDelete->SetState(ActorState::Destroy);
 }
 
-std::string ObjectManager::AddObject(const Vector2& playerRelativeLocation, const SpawnableObjects objectToAdd)
+std::string ObjectManager::AddObject(const Vector2 &playerRelativeLocation, const SpawnableObjects objectToAdd)
 {
     const Vector2 spawnPosition = mGame->GetPlayer()->GetPosition() + playerRelativeLocation;
 
     switch (objectToAdd)
     {
-        case SpawnableObjects::Block:
-        { // example spawn
-            Block* newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
-            newBlock->SetPosition(spawnPosition);
-            return {};
-        }
-        default: break;
+    case SpawnableObjects::Block:
+    { // example spawn
+        Block *newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
+        newBlock->SetPosition(spawnPosition);
+        return {};
+    }
+    default:
+        break;
     }
     return {"none"};
 }

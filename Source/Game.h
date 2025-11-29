@@ -54,6 +54,7 @@ public:
 
     // Game specific
     class Cat *GetPlayer() { return mCat; }
+    class Terminal *GetTerminal() { return mTerminal; }
 
     std::vector<Actor *> GetAllActors() const { return mActors; }
 
