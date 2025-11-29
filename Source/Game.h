@@ -57,6 +57,20 @@ public:
 
     std::vector<Actor *> GetAllActors() const { return mActors; }
 
+    enum class GameScene
+    {
+        MainMenu,
+        Playing
+    };
+
+    void SetScene(GameScene nextScene);
+    void UnloadScene();
+    
+    GameScene mCurrentScene = GameScene::MainMenu;
+    class Font* mUiFont = nullptr;
+    class AudioSystem* mAudio = nullptr;
+    class MainMenu* mMainMenu = nullptr;
+
 private:
     void ProcessInput();
     void UpdateGame(float deltaTime);

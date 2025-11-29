@@ -30,9 +30,24 @@
 #include "Actors/SpawnBlock.h"
 #include "Utils/DialogManager.h"
 #include "Utils/ObjectManager.h"
+#include "Renderer/Font.h"
+#include "AudioSystem.h"
+#include "MainMenu.h"
 
 Game::Game()
-    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr)
+    : mWindow(nullptr)
+    , mRenderer(nullptr)
+    , mTicksCount(0)
+    , mIsRunning(true)
+    , mIsDebugging(false)
+    , mUpdatingActors(false)
+    , mCameraPos(0.f, 0.f)
+    , mCat(nullptr)
+    , mLevelData(nullptr)
+    , mTerminal(nullptr)
+    , mCurrentScene(GameScene::MainMenu)
+    , mUiFont(nullptr)
+    , mAudio(nullptr)
 {
 }
 
@@ -59,17 +74,26 @@ bool Game::Initialize()
         return false;
     }
 
-    if (IMG_Init(IMG_INIT_PNG) == 0)
+    int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if ((IMG_Init(imgFlags) & imgFlags) != imgFlags)
     {
-        SDL_Log("Unable to initialize SDL_image: %s", SDL_GetError());
+        SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
         return false;
     }
 
     mRenderer = new Renderer(mWindow);
     mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-    // Init all game actors
-    InitializeActors();
+    mUiFont = new Font();
+    mUiFont->Load("../Assets/Fonts/Arial.ttf");
+
+    mAudio = new AudioSystem();
+    if (!mAudio->Initialize())
+    {
+        SDL_Log("AudioSystem failed to initialize");
+    }
+
+    mMainMenu = new MainMenu(this, mUiFont);
 
     mTicksCount = SDL_GetTicks();
 
@@ -279,22 +303,34 @@ void Game::ProcessInput()
             Quit();
             break;
         }
-
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        // no menu principal, apenas processa eventos normais
+        // para evitar de "abrir o terminal"
+        if (mCurrentScene != GameScene::MainMenu)
         {
-            mTerminal->Toggle();
-            continue;
-        }
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+            {
+                mTerminal->Toggle();
+                continue;
+            }
 
-        // Terminal captura eventos
-        mTerminal->ProcessEvent(event);
+            // Terminal captura eventos so na gameplay
+            mTerminal->ProcessEvent(event);
+        }
+        else if (mMainMenu)
+        {
+            mMainMenu->HandleEvent(event);
+        }
+    }
+
+    if (mCurrentScene == GameScene::MainMenu)
+    {
+        return;
     }
 
     if (mTerminal->IsActive())
         return;
 
     const Uint8 *state = SDL_GetKeyboardState(nullptr);
-
     for (auto actor : mActors)
     {
         actor->ProcessInput(state);
@@ -303,11 +339,18 @@ void Game::ProcessInput()
 
 void Game::UpdateGame(float deltaTime)
 {
+    if (mCurrentScene == GameScene::MainMenu)
+    {
+        if (mAudio) mAudio->Update();
+        return; // não atualiza nada no menu principal
+    }
     // Update all actors and pending actors
     UpdateActors(deltaTime);
 
     // Update camera position
     UpdateCamera();
+
+    if (mAudio) mAudio->Update();
 
     std::string command = mTerminal->ConsumeCommand();
     if (!command.empty())
@@ -422,21 +465,28 @@ void Game::GenerateOutput()
     // Clear back buffer
     mRenderer->Clear();
 
-    for (auto drawable : mDrawables)
+    if (mCurrentScene == GameScene::MainMenu)
     {
-        drawable->Draw(mRenderer);
-
-        if (mIsDebugging)
+        if (mMainMenu) mMainMenu->Draw(mIsDebugging);
+    }
+    else
+    {
+        for (auto drawable : mDrawables)
         {
-            // Call draw for actor components
-            for (auto comp : drawable->GetOwner()->GetComponents())
+            drawable->Draw(mRenderer);
+
+            if (mIsDebugging)
             {
-                comp->DebugDraw(mRenderer);
+                for (auto comp : drawable->GetOwner()->GetComponents())
+                {
+                    comp->DebugDraw(mRenderer);
+                }
             }
         }
+        if (mTerminal)
+            mTerminal->Draw();
     }
-    if (mTerminal)
-        mTerminal->Draw();
+
     // Swap front buffer and back buffer
     mRenderer->Present();
 }
@@ -465,6 +515,19 @@ void Game::Shutdown()
 
     delete mObjManager;
     mObjManager = nullptr;
+
+    if (mAudio)
+    {
+        mAudio->Shutdown();
+        delete mAudio;
+        mAudio = nullptr;
+    }
+
+    if (mMainMenu)
+    {
+        delete mMainMenu;
+        mMainMenu = nullptr;
+    }
 
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
