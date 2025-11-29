@@ -139,7 +139,6 @@ void Cat::OnUpdate(float deltaTime)
 
     ManageAnimations();
 
-    // Walking SFX: loop while running on ground; stop/reset otherwise
     if (mGame && mGame->mAudio)
     {
         if (mIsRunning && mIsOnGround)
