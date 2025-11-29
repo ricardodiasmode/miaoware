@@ -26,7 +26,7 @@
       }
     },
     {
-      "filename": "Jump4.png",
+      "filename": "Jump/Jump4.png",
       "frame": {
         "x": 0,
         "y": 22,
@@ -51,7 +51,7 @@
       }
     },
     {
-      "filename": "Jump1.png",
+      "filename": "Jump/Jump1.png",
       "frame": {
         "x": 32,
         "y": 0,
@@ -76,7 +76,7 @@
       }
     },
     {
-      "filename": "Jump7.png",
+      "filename": "Jump/Jump7.png",
       "frame": {
         "x": 0,
         "y": 54,
@@ -101,7 +101,7 @@
       }
     },
     {
-      "filename": "Jump2.png",
+      "filename": "Jump/Jump2.png",
       "frame": {
         "x": 64,
         "y": 0,
@@ -126,7 +126,7 @@
       }
     },
     {
-      "filename": "Jump3.png",
+      "filename": "Jump/Jump3.png",
       "frame": {
         "x": 0,
         "y": 86,
@@ -151,7 +151,7 @@
       }
     },
     {
-      "filename": "Jump5.png",
+      "filename": "Jump/Jump5.png",
       "frame": {
         "x": 96,
         "y": 0,
@@ -176,7 +176,7 @@
       }
     },
     {
-      "filename": "Jump8.png",
+      "filename": "Jump/Jump8.png",
       "frame": {
         "x": 30,
         "y": 25,
@@ -201,7 +201,7 @@
       }
     },
     {
-      "filename": "Jump6.png",
+      "filename": "Jump/Jump6.png",
       "frame": {
         "x": 0,
         "y": 117,
