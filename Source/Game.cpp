@@ -32,6 +32,7 @@
 #include "Utils/ObjectManager.h"
 #include "Renderer/Font.h"
 #include "AudioSystem.h"
+#include "MainMenu.h"
 
 Game::Game()
     : mWindow(nullptr)
@@ -73,9 +74,10 @@ bool Game::Initialize()
         return false;
     }
 
-    if (IMG_Init(IMG_INIT_PNG) == 0)
+    int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if ((IMG_Init(imgFlags) & imgFlags) != imgFlags)
     {
-        SDL_Log("Unable to initialize SDL_image: %s", SDL_GetError());
+        SDL_Log("Unable to initialize SDL_image: %s", IMG_GetError());
         return false;
     }
 
@@ -90,6 +92,8 @@ bool Game::Initialize()
     {
         SDL_Log("AudioSystem failed to initialize");
     }
+
+    mMainMenu = new MainMenu(this, mUiFont);
 
     mTicksCount = SDL_GetTicks();
 
@@ -312,17 +316,14 @@ void Game::ProcessInput()
             // Terminal captura eventos so na gameplay
             mTerminal->ProcessEvent(event);
         }
+        else if (mMainMenu)
+        {
+            mMainMenu->HandleEvent(event);
+        }
     }
 
     if (mCurrentScene == GameScene::MainMenu)
     {
-        const Uint8 *keys = SDL_GetKeyboardState(nullptr);
-        if (keys[SDL_SCANCODE_RETURN])
-        {
-            if (mAudio) mAudio->PlaySound("MainMenuMeow.mp3", false);
-            InitializeActors();
-            mCurrentScene = GameScene::Playing;
-        }
         return;
     }
 
@@ -466,20 +467,7 @@ void Game::GenerateOutput()
 
     if (mCurrentScene == GameScene::MainMenu)
     {
-        if (mUiFont)
-        {
-            Texture *tex = mUiFont->RenderText("Compartilhar", Vector3(1,1,1), 28);
-            if (tex)
-            {
-                float w = (float)tex->GetWidth();
-                float h = (float)tex->GetHeight();
-                Vector2 center(Game::WINDOW_WIDTH * 0.5f, Game::WINDOW_HEIGHT * 0.5f);
-                mRenderer->DrawTexture(center, Vector2(w, h), 0.0f,
-                                       Vector3(1,1,1), tex, Vector4(0,0,1,1), Vector2::Zero, false, 1.0f);
-                tex->Unload();
-                delete tex;
-            }
-        }
+        if (mMainMenu) mMainMenu->Draw(mIsDebugging);
     }
     else
     {
@@ -533,6 +521,12 @@ void Game::Shutdown()
         mAudio->Shutdown();
         delete mAudio;
         mAudio = nullptr;
+    }
+
+    if (mMainMenu)
+    {
+        delete mMainMenu;
+        mMainMenu = nullptr;
     }
 
     SDL_DestroyWindow(mWindow);

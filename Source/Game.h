@@ -69,6 +69,7 @@ public:
     GameScene mCurrentScene = GameScene::MainMenu;
     class Font* mUiFont = nullptr;
     class AudioSystem* mAudio = nullptr;
+    class MainMenu* mMainMenu = nullptr;
 
 private:
     void ProcessInput();
