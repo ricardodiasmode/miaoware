@@ -572,7 +572,7 @@ void Game::ProcessTerminalCommand(const std::string &input)
             {
                 if (!ValidateVector2(arg3))
                 {
-                    mTerminal->AddLine("Error: value must be in format (x,y). Example: (1.0, 2.5)");
+                    mTerminal->AddLine("Error: value must be in format (x,y). Example: (1,2)");
                     return;
                 }
             }
