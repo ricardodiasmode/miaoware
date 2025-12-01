@@ -17,6 +17,9 @@ AABBColliderComponent::AABBColliderComponent(class Actor* owner, int dx, int dy,
         ,mLayer(layer)
 {
     GetGame()->AddCollider(this);
+    mOrigWidth = w;
+    mOrigHeight = h;
+    mOrigOffset = mOffset;
 }
 
 AABBColliderComponent::~AABBColliderComponent()

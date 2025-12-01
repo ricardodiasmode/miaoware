@@ -7,9 +7,11 @@
 #include "../Components/Drawing/AnimatorComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Block::Block(Game* game, const std::string& uniqueName, const std::string &texturePath, const bool isStatic)
+Block::Block(Game* game, const std::string& uniqueName, const std::string &texturePath, const bool isStatic, const bool isManageable)
         :Actor(game, uniqueName)
 {
+        mIsManageable = isManageable;
+
         new AnimatorComponent(this,
                 texturePath,
                 {},

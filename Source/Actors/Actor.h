@@ -37,7 +37,7 @@ public:
 
     // Scale getter/setter
     const Vector2& GetScale() const { return mScale; }
-    void SetScale(const Vector2& scale) { mScale = scale; }
+    void SetScale(const Vector2& scale);
 
     // Rotation getter/setter
     float GetRotation() const { return mRotation; }

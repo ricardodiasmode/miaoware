@@ -33,6 +33,8 @@ public:
     void SetEnabled(const bool enabled) { mIsEnabled = enabled; };
     bool IsEnabled() const { return mIsEnabled; };
 
+    virtual void OnScaleChanged() {}
+
 protected:
     // Owning actor
     class Actor* mOwner;

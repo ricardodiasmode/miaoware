@@ -35,19 +35,7 @@
 #include "MainMenu.h"
 
 Game::Game()
-    : mWindow(nullptr)
-    , mRenderer(nullptr)
-    , mTicksCount(0)
-    , mIsRunning(true)
-    , mIsDebugging(false)
-    , mUpdatingActors(false)
-    , mCameraPos(0.f, 0.f)
-    , mCat(nullptr)
-    , mLevelData(nullptr)
-    , mTerminal(nullptr)
-    , mCurrentScene(GameScene::MainMenu)
-    , mUiFont(nullptr)
-    , mAudio(nullptr)
+    : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr), mCurrentScene(GameScene::MainMenu), mUiFont(nullptr), mAudio(nullptr)
 {
 }
 
@@ -106,8 +94,8 @@ bool Game::Initialize()
 
 void Game::InitializeActors()
 {
-    int** level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    //int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    // int **level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
+    int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
     BuildLevel(level, Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
 }
 
@@ -171,9 +159,11 @@ void Game::BuildLevel(int **levelData, int width, int height)
 
     // Percorre a matriz de tiles
     int objNum = 0;
-    for (int row = 0; row < height; row++)
+    int managebleCounter = 0;
+    for (int col = 0; col < width; col++)
     {
-        for (int col = 0; col < width; col++)
+        for (int row = 0; row < height; row++)
+
         {
             int tileID = levelData[row][col];
 
@@ -186,7 +176,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
             {
             case 0:
                 // Chão
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockA.png");
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockL.png");
                 break;
             case 1:
             {
@@ -214,7 +204,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
                 break;
             case 8:
                 // Chão especial
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockK.png");
                 break;
             case 10:
             {
@@ -251,7 +241,8 @@ void Game::BuildLevel(int **levelData, int width, int height)
             }
             case 99:
                 // bloco manageable
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png");
+                NewBlock = new Block(this, "Block" + std::to_string(managebleCounter), "../Assets/Sprites/Blocks/BlockJ.png", true, true);
+                managebleCounter = managebleCounter + 1;
                 break;
             default:
                 break;
@@ -341,7 +332,8 @@ void Game::UpdateGame(float deltaTime)
 {
     if (mCurrentScene == GameScene::MainMenu)
     {
-        if (mAudio) mAudio->Update();
+        if (mAudio)
+            mAudio->Update();
         return; // não atualiza nada no menu principal
     }
     // Update all actors and pending actors
@@ -350,7 +342,8 @@ void Game::UpdateGame(float deltaTime)
     // Update camera position
     UpdateCamera();
 
-    if (mAudio) mAudio->Update();
+    if (mAudio)
+        mAudio->Update();
 
     std::string command = mTerminal->ConsumeCommand();
     if (!command.empty())
@@ -467,7 +460,8 @@ void Game::GenerateOutput()
 
     if (mCurrentScene == GameScene::MainMenu)
     {
-        if (mMainMenu) mMainMenu->Draw(mIsDebugging);
+        if (mMainMenu)
+            mMainMenu->Draw(mIsDebugging);
     }
     else
     {
@@ -563,7 +557,8 @@ void Game::ProcessTerminalCommand(const std::string &input)
     }
     else if (verb == "set")
     {
-        if (ss >> arg1 >> arg2 >> arg3) {
+        if (ss >> arg1 >> arg2 >> arg3)
+        {
             std::string originalValue = input.substr(input.find(arg3.substr(0, 1)));
             if (arg2 == "rotation")
             {
@@ -582,7 +577,9 @@ void Game::ProcessTerminalCommand(const std::string &input)
                 }
             }
             mObjManager->SetAttributeValue(arg1, arg2, arg3);
-        } else  {
+        }
+        else
+        {
             mTerminal->AddLine("Usage: set <Object Name> <Attribute> <Value>");
         }
     }
@@ -602,14 +599,14 @@ void Game::ProcessTerminalCommand(const std::string &input)
     }
 }
 
-bool Game::ValidateRotation(const std::string& value)
+bool Game::ValidateRotation(const std::string &value)
 {
-    char* end;
+    char *end;
     std::strtod(value.c_str(), &end);
     return end != value.c_str() && *end == '\0';
 }
 
-bool Game::ValidateVector2(const std::string& value)
+bool Game::ValidateVector2(const std::string &value)
 {
     if (value.size() < 5 || value.front() != '(' || value.back() != ')')
         return false;
@@ -623,9 +620,9 @@ bool Game::ValidateVector2(const std::string& value)
     std::string x = inside.substr(0, comma);
     std::string y = inside.substr(comma + 1);
 
-    auto isNumber = [](const std::string& s)
+    auto isNumber = [](const std::string &s)
     {
-        char* end;
+        char *end;
         std::strtod(s.c_str(), &end);
         return end != s.c_str() && *end == '\0';
     };

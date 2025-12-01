@@ -41,6 +41,14 @@ public:
 
     void Resize(int w, int h, Vector2 offset);
 
+    int mWidth;
+    int mHeight;
+    Vector2 mOffset;
+    int mOrigWidth;
+    int mOrigHeight;
+    Vector2 mOrigOffset;
+
+
 private:
     float GetMinVerticalOverlap(AABBColliderComponent* b);
     float GetMinHorizontalOverlap(AABBColliderComponent* b);
@@ -48,9 +56,7 @@ private:
     void ResolveHorizontalCollisions(RigidBodyComponent *rigidBody, const float minOverlap) const;
     void ResolveVerticalCollisions(RigidBodyComponent *rigidBody, const float minOverlap) const;
 
-    Vector2 mOffset;
-    int mWidth;
-    int mHeight;
+
     bool mIsStatic;
 
     ColliderLayer mLayer;
