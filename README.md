@@ -34,7 +34,7 @@ Este repositório contém o trabalho do grupo. Atualize os nomes e atribuições
 - Lucas Rocha Laredo — Menu Principal, animações, sistema de áudio (AudioSystem)
 - Hector Julio Pardinho Soares — Terminal, implementação do level design e sistema de colisões
 - Mirna Mendonça — Assets, Level Design, Sprites
-- Ricardo Dias Avelar — ...
+- Ricardo Dias Avelar — Diálogo, componentes, mecânicas usadas pelo terminal
 - Victor Prates Figueiredo — ...
 
 Todos os membros foram adicionados como colaboradores no repositório GitHub.
