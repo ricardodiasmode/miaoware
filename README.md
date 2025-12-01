@@ -35,6 +35,6 @@ Este repositório contém o trabalho do grupo. Atualize os nomes e atribuições
 - Hector Julio Pardinho Soares — Terminal, implementação do level design e sistema de colisões
 - Mirna Mendonça — Assets, Level Design, Sprites
 - Ricardo Dias Avelar — Diálogo, componentes, mecânicas usadas pelo terminal
-- Victor Prates Figueiredo — ...
+- Victor Prates Figueiredo — Correção de bugs (Terminal e mecanicas)
 
 Todos os membros foram adicionados como colaboradores no repositório GitHub.
