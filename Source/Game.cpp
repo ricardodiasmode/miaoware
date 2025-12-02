@@ -26,7 +26,6 @@
 #include "Actors/MovingBlock.h"
 #include "Actors/Spawner.h"
 #include "Actors/Cat.h"
-#include "Actors/Mushroom.h"
 #include "Actors/SpawnBlock.h"
 #include "Utils/DialogManager.h"
 #include "Utils/ObjectManager.h"
@@ -178,26 +177,6 @@ void Game::BuildLevel(int **levelData, int width, int height)
                 // Chão
                 NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockL.png");
                 break;
-            case 1:
-            {
-                // Interrogação
-                // Hardcodando posições porque nao foi especificado como seria a pré-definição (poderia ser em .csv também)
-                static const std::vector<Vector2> spawnableBlocks = {
-                    Vector2(2, 34),
-                    Vector2(10, 162)};
-                const Vector2 currentPos(row, col);
-                if (std::find(spawnableBlocks.begin(), spawnableBlocks.end(), currentPos) != spawnableBlocks.end())
-                {
-                    NewBlock = SpawnBlock::create<Mushroom>(
-                        this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png", 100.f);
-                }
-                else
-                {
-                    NewBlock = new MovingBlock(
-                        this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockC.png");
-                }
-                break;
-            }
             case 4:
                 // Brick
                 NewBlock = new MovingBlock(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockB.png");
@@ -562,7 +541,7 @@ void Game::ProcessTerminalCommand(const std::string &input)
             std::string originalValue = input.substr(input.find(arg3.substr(0, 1)));
             if (arg2 == "rotation")
             {
-                if (!ValidateRotation(arg3))
+                if (!ValidateNumber(arg3))
                 {
                     mTerminal->AddLine("Error: rotation must be a single number. Example: 45");
                     return;
@@ -573,6 +552,14 @@ void Game::ProcessTerminalCommand(const std::string &input)
                 if (!ValidateVector2(arg3))
                 {
                     mTerminal->AddLine("Error: value must be in format (x,y). Example: (1,2)");
+                    return;
+                }
+            }
+            else if (arg2 == "damage")
+            {
+                if (!ValidateNumber(arg3))
+                {
+                    mTerminal->AddLine("Error: damage must be a single number. Example: 0");
                     return;
                 }
             }
@@ -599,7 +586,7 @@ void Game::ProcessTerminalCommand(const std::string &input)
     }
 }
 
-bool Game::ValidateRotation(const std::string &value)
+bool Game::ValidateNumber(const std::string &value)
 {
     char *end;
     std::strtod(value.c_str(), &end);

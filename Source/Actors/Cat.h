@@ -21,8 +21,6 @@ public:
 
     void Kill() override;
 
-    void EatMushroomEffect();
-
     void EnemyHit(AABBColliderComponent *other);
 
 private:
@@ -36,7 +34,6 @@ private:
     float mJumpSpeed;
     bool mIsRunning;
     bool mIsDead;
-    bool mIsBig;
     bool mWalkingSfxPlaying = false;
 
     int mDirection;
@@ -44,9 +41,5 @@ private:
 
     class RigidBodyComponent* mRigidBodyComponent;
     class AnimatorComponent* mDrawComponent;
-    class AnimatorComponent* mDrawComponentBig;
     class AABBColliderComponent* mColliderComponent;
-    class ParticleSystemComponent* mFireBalls;
-
-    float mFireBallCooldown = 1.0f;
 };

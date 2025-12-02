@@ -4,6 +4,7 @@
 
 #include "Cat.h"
 
+#include "Dog.h"
 #include "MovingBlock.h"
 #include "../Game.h"
 #include "../Components/Drawing/AnimatorComponent.h"
@@ -30,9 +31,6 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
     mDrawComponent->AddAnimation("jump", {2,4,5,1,6,9,3,7});
     mDrawComponent->AddAnimation("run", {10,16,18,14,19,20,21,22}); // Select a smooth subset for looping
     mDrawComponent->SetAnimFPS(6.f); // base (jump speed)
-
-    // Big/super variant not used for Cat assets; disable big component path
-    mDrawComponentBig = nullptr;
 
     mDrawComponent->SetAnimation("idle");
 
@@ -177,7 +175,6 @@ void Cat::Kill()
 {
     if (mIsDead)
         return;
-    DecreaseSize();
 
     mDrawComponent->SetAnimation("dead");
     mIsDead = true;
@@ -193,42 +190,16 @@ void Cat::Kill()
     }
 }
 
-void Cat::EatMushroomEffect()
-{
-    mIsBig = true;
-}
-
-void Cat::DecreaseSize()
-{
-    if (!mIsBig)
-        return;
-
-    mIsBig = false;
-}
-
 void Cat::EnemyHit(AABBColliderComponent *other)
 {
-    if (mIsBig)
-    {
-        DecreaseSize();
-
-        other->GetOwner()->Kill();
-    }
-    else
-    {
-        Kill();
-    }
+    Kill();
 }
 
 void Cat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Enemy)
+    if (other->GetLayer() == ColliderLayer::Enemy && dynamic_cast<Dog*>(other->GetOwner())->IsDamageEnabled())
     {
         EnemyHit(other);
-    } else if (other->GetLayer() == ColliderLayer::Mushroom)
-    {
-        other->GetOwner()->SetState(ActorState::Destroy);
-        EatMushroomEffect();
     } else if (mAutoWalk){
         ReverseDirection();
     }
@@ -244,15 +215,13 @@ void Cat::OnVerticalCollision(const float minOverlap, AABBColliderComponent* oth
         newVelocity.y = mJumpSpeed;
         mRigidBodyComponent->SetVelocity(newVelocity);
         return;
-    } else if (other->GetLayer() == ColliderLayer::Blocks &&
+    }
+
+    if (other->GetLayer() == ColliderLayer::Blocks &&
         dynamic_cast<MovingBlock*>(other->GetOwner()) &&
         minOverlap > 0)
     {
         dynamic_cast<MovingBlock*>(other->GetOwner())->StartMovementInterp();
-    } else if (other->GetLayer() == ColliderLayer::Mushroom)
-    {
-        other->GetOwner()->SetState(ActorState::Destroy);
-        EatMushroomEffect();
     }
 }
 
@@ -263,7 +232,7 @@ void Cat::ReverseDirection()
     if (mRigidBodyComponent)
     {
         Vector2 vel = mRigidBodyComponent->GetVelocity();
-        vel.x = mDirection * mForwardSpeed;
+        vel.x = static_cast<float>(mDirection) * mForwardSpeed;
         mRigidBodyComponent->SetVelocity(vel);
     }
     // ajustar sprite

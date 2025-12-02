@@ -8,6 +8,7 @@
 #include "../Terminal.h"
 #include "../Actors/Cat.h"
 #include "../Actors/Block.h"
+#include "../Actors/Dog.h"
 #include <vector>
 #include <algorithm>
 
@@ -118,6 +119,19 @@ void ObjectManager::SetAttributeValue(const std::string &objName, const std::str
         actorToModify->SetScale(newScale);
         return;
     }
+    if (attributeName == "damage")
+    {
+        if (value == "0")
+        {
+            SDL_Log("disabling damage");
+            DisableDamage(objName);
+        } else
+        {
+            SDL_Log("enabling damage");
+            EnableDamage(objName);
+        }
+        return;
+    }
 }
 
 void ObjectManager::Jump()
@@ -137,6 +151,32 @@ void ObjectManager::DeleteObject(const std::string &objName)
     actorToDelete->SetState(ActorState::Destroy);
 }
 
+void ObjectManager::DisableDamage(const std::string &objName)
+{
+    Actor *actorToDelete = GetActorByName(objName);
+    Dog* dogToDelete = dynamic_cast<Dog*>(actorToDelete);
+    if (!dogToDelete)
+    {
+        SDL_LogError(0, "ObjectManager::RemoveDamage called with wrong obj name.");
+        return;
+    }
+
+    dogToDelete->DisableDamage();
+}
+
+void ObjectManager::EnableDamage(const std::string &objName)
+{
+    Actor *actorToDelete = GetActorByName(objName);
+    Dog* dogToDelete = dynamic_cast<Dog*>(actorToDelete);
+    if (!dogToDelete)
+    {
+        SDL_LogError(0, "ObjectManager::RemoveDamage called with wrong obj name.");
+        return;
+    }
+
+    dogToDelete->EnableDamage();
+}
+
 std::string ObjectManager::AddObject(const Vector2 &playerRelativeLocation, const SpawnableObjects objectToAdd)
 {
     const Vector2 spawnPosition = mGame->GetPlayer()->GetPosition() + playerRelativeLocation;
@@ -145,7 +185,7 @@ std::string ObjectManager::AddObject(const Vector2 &playerRelativeLocation, cons
     {
     case SpawnableObjects::Block:
     { // example spawn
-        Block *newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
+        auto *newBlock = new Block(mGame, "Block" + std::to_string(9999), "../Assets/Sprites/Blocks/BlockI.png");
         newBlock->SetPosition(spawnPosition);
         return {};
     }

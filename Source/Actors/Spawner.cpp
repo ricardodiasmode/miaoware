@@ -5,7 +5,7 @@
 #include "Spawner.h"
 #include "../Game.h"
 #include "Cat.h"
-#include "Goomba.h"
+#include "Dog.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
 Spawner::Spawner(Game* game, const std::string& uniqueName, float spawnDistance)
@@ -19,12 +19,10 @@ void Spawner::OnUpdate(float deltaTime)
 {
         if (mGame->GetPlayer()->GetPosition().x < mSpawnDistance)
         {
-                auto* goomba = new Goomba(mGame, "Goomba");
-
-                goomba->SetPosition(GetPosition());
-
-                goomba->GetComponent<AABBColliderComponent>()->SetEnabled(true);
-
+                auto* dog = new Dog(mGame, "Dog" + std::to_string(mGame->GetDogNum()));
+                dog->mIsManageable = true;
+                dog->SetPosition(GetPosition());
+                dog->GetComponent<AABBColliderComponent>()->SetEnabled(true);
                 mState = ActorState::Destroy;
         }
 }

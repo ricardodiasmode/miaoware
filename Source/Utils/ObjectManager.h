@@ -34,6 +34,8 @@ public:
     void SetAttributeValue(const std::string& objName, const std::string& attributeName, const std::string& value);
     void Jump();
     void DeleteObject(const std::string& objName);
+    void DisableDamage(const std::string& objName);
+    void EnableDamage(const std::string& objName);
 
     /**
      * @param playerRelativeLocation The location that the object will spawn, relative to the player

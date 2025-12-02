@@ -280,7 +280,8 @@ void Terminal::DrawHelper(float left, float top, float width) {
             "Attributes (attr):",
             "  rotation     value: x            (float)",
             "  position     value: (x,y)        (floats)",
-            "  scale        value: (x,y)        (floats)"
+            "  scale        value: (x,y)        (floats)",
+            "  damage       value: x            (0,1)"
         };
 
         float textX = px + 10.0f;

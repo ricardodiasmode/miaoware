@@ -2,7 +2,7 @@
 // Created by Lucas N. Ferreira on 30/09/23.
 //
 
-#include "Goomba.h"
+#include "Dog.h"
 
 #include "Cat.h"
 #include "../Game.h"
@@ -10,11 +10,12 @@
 #include "../Components/Physics/RigidBodyComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
-Goomba::Goomba(Game* game, const std::string& uniqueName, float forwardSpeed, float deathTime)
+Dog::Dog(Game* game, const std::string& uniqueName, float forwardSpeed, float deathTime)
         : Actor(game, uniqueName)
         , mDyingTimer(deathTime)
         , mIsDying(false)
         , mForwardSpeed(forwardSpeed)
+        , mDamageEnabled(true)
 {
         mDrawComponent = new AnimatorComponent(this,
             "../Assets/Sprites/Goomba/Goomba.png",
@@ -38,9 +39,11 @@ Goomba::Goomba(Game* game, const std::string& uniqueName, float forwardSpeed, fl
                 Game::TILE_SIZE,
                 ColliderLayer::Enemy);
         mColliderComponent->SetEnabled(false);
+
+        game->AddDog(this);
 }
 
-void Goomba::Kill()
+void Dog::Kill()
 {
     mIsDying = true;
     mDrawComponent->SetAnimation("dead");
@@ -48,7 +51,7 @@ void Goomba::Kill()
     mColliderComponent->SetEnabled(false);
 }
 
-void Goomba::OnUpdate(float deltaTime)
+void Dog::OnUpdate(float deltaTime)
 {
     if (mIsDying)
     {
@@ -62,9 +65,9 @@ void Goomba::OnUpdate(float deltaTime)
         mState = ActorState::Destroy;
 }
 
-void Goomba::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
+void Dog::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* other)
 {
-    if (other->GetLayer() == ColliderLayer::Player)
+    if (other->GetLayer() == ColliderLayer::Player && mDamageEnabled)
     {
         dynamic_cast<Cat*>(other->GetOwner())->EnemyHit(mColliderComponent);
         return;

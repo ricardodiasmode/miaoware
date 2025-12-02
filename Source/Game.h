@@ -10,6 +10,9 @@
 #include <SDL.h>
 #include <vector>
 #include "Renderer/Renderer.h"
+#include <algorithm>
+
+class Dog;
 
 class Game
 {
@@ -72,6 +75,14 @@ public:
     class AudioSystem* mAudio = nullptr;
     class MainMenu* mMainMenu = nullptr;
 
+    void AddDog(Dog* dog) { mDogs.push_back(dog); }
+    void RemoveDog(Dog* dog) {
+        auto it = std::find(mDogs.begin(), mDogs.end(), dog);
+        if (it != mDogs.end())
+            *it = mDogs.back(), mDogs.pop_back();  // swap-with-last
+    }
+    int GetDogNum() const { return static_cast<int>(mDogs.size()); }
+
 private:
     void ProcessInput();
     void UpdateGame(float deltaTime);
@@ -83,13 +94,14 @@ private:
     void BuildLevel(int **levelData, int width, int height);
 
     bool ValidateVector2(const std::string & string);
-    bool ValidateRotation(const std::string & string);
+    bool ValidateNumber(const std::string & string);
 
     void ProcessTerminalCommand(const std::string &input);
 
     // All the actors in the game
     std::vector<class Actor *> mActors;
     std::vector<class Actor *> mPendingActors;
+    std::vector<class Dog *> mDogs;
 
     // Camera
     Vector2 mCameraPos;
