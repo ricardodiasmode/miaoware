@@ -68,7 +68,7 @@ bool Game::Initialize()
         return false;
     }
 
-    mRenderer = new Renderer(mWindow);
+    mRenderer = new Renderer(mWindow, this);
     mRenderer->Initialize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     mUiFont = new Font();
@@ -84,18 +84,151 @@ bool Game::Initialize()
 
     mTicksCount = SDL_GetTicks();
 
-    mObjManager = new ObjectManager(this);
-    mTerminal = new Terminal(mRenderer);
-    mDialogManager = new DialogManager(mTerminal);
-
     return true;
+}
+
+void Game::UnloadScene()
+{
+    UnloadMenu();
+
+    // Use state so we can call this from withing an a actor update
+    for(auto *actor : mActors) {
+        actor->SetState(ActorState::Destroy);
+    }
+
+    if (mObjManager)
+    {
+        delete mObjManager;
+        mObjManager = nullptr;
+    }
+    if (mTerminal)
+    {
+        delete mTerminal;
+        mTerminal = nullptr;
+    }
+    if (mDialogManager)
+    {
+        delete mDialogManager;
+        mDialogManager = nullptr;
+    }
+}
+
+void Game::StartFade(const std::function<void()>& fadeCallback)
+{
+    mFadeCallback = fadeCallback;
+    mIsFading = true;
+    mFadeValue = 0.f;
+    mIsFadeIn = true;
+}
+
+void Game::Fade(const float deltaTime)
+{
+    mFadeValue += mIsFadeIn ? deltaTime : -deltaTime;
+    mFadeValue = Math::Clamp(mFadeValue, 0.f, 1.f);
+    if (mFadeValue == 0.f || mFadeValue == 1.f)
+    {
+        if (mFadeValue == 1.f)
+        {
+            mIsFadeIn = false;
+            mFadeCallback();
+        } else
+        {
+            mIsFading = false;
+        }
+    }
+}
+
+void Game::SetScene(GameScene nextScene)
+{
+    UnloadScene();
+
+    mCurrentScene = nextScene;
+
+    switch (nextScene)
+    {
+        case GameScene::Level1:
+        {
+            StartFade([this]
+            {
+                // Todo: initialize Level1
+                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                BuildLevel(level, 15, 45);
+
+                InitializeCore();
+
+                mDialogManager->PlayDialog(DialogKeys::FASE1);
+
+                SetConditionForLevelChange([this]
+                {
+                    if (mCat)
+                        return mCat->GetPosition().x > TILE_SIZE*15;
+                    return false;
+                });
+            });
+            break;
+        }
+        case GameScene::Level2:
+        {
+            StartFade([this]
+            {
+                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                BuildLevel(level, 15, 45);
+
+                InitializeCore();
+
+                mDialogManager->PlayDialog(DialogKeys::FASE2);
+            });
+            break;
+        }
+        case GameScene::Level3:
+        {
+            StartFade([this]
+            {
+                // Todo: initialize Level3
+                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                BuildLevel(level, 15, 45);
+
+                InitializeCore();
+
+                mDialogManager->PlayDialog(DialogKeys::FASE3);
+            });
+            break;
+        }
+        case GameScene::Level4:
+        {
+            StartFade([this]
+            {
+                // Todo: initialize Level4
+                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                BuildLevel(level, 15, 45);
+
+                InitializeCore();
+
+                mDialogManager->PlayDialog(DialogKeys::FASE4);
+            });
+            break;
+        }
+        case GameScene::Level5:
+        {
+            StartFade([this]
+            {
+                // Todo: initialize Level5
+                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                BuildLevel(level, 15, 45);
+
+                InitializeCore();
+
+                mDialogManager->PlayDialog(DialogKeys::FASE5);
+            });
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void Game::InitializeActors()
 {
-    // int **level = LoadLevel("../Assets/Levels/Level1-1/level1-1.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    int **level = LoadLevel("../Assets/Levels/Level1-3/level1-3.csv", Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
-    BuildLevel(level, Game::LEVEL_WIDTH, Game::LEVEL_HEIGHT);
 }
 
 int **Game::LoadLevel(const std::string &fileName, int width, int height)
@@ -173,58 +306,35 @@ void Game::BuildLevel(int **levelData, int width, int height)
             // Instancia objetos baseado no ID do tile
             switch (tileID)
             {
-            case 0:
-                // Chão
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockL.png");
-                break;
-            case 4:
-                // Brick
-                NewBlock = new MovingBlock(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockB.png");
-                break;
-            case 8:
-                // Chão especial
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockK.png");
-                break;
-            case 10:
-            {
-                auto *spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
-                const Vector2 pos(posX, posY);
-                spawner->SetPosition(pos);
-                break;
-            }
-            case 12:
-                // Cano verde cima direita
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockG.png");
-                break;
-            case 2:
-                // Cano verde cima esquerda
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockF.png");
-                break;
-            case 9:
-                // cano verde baixo esquerda
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockH.png");
-                break;
-            case 6:
-                // Cano verde baixo direita
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockI.png");
-                break;
-            case 7:
-                // Cano verde topo direito
-                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockD.png");
-                break;
-            case 16:
-            {
-                mCat = new Cat(this, "Player" + std::to_string(objNum));
-                const Vector2 pos(posX, posY);
-                mCat->SetPosition(pos);
-            }
-            case 99:
-                // bloco manageable
-                NewBlock = new Block(this, "Block" + std::to_string(managebleCounter), "../Assets/Sprites/Blocks/BlockJ.png", true, true);
-                managebleCounter = managebleCounter + 1;
-                break;
-            default:
-                break;
+                case 0:
+                    // bloco manageable
+                    NewBlock = new Block(this, "Block" + std::to_string(managebleCounter), "../Assets/Sprites/Blocks/BlockJ.png", true, true);
+                    managebleCounter = managebleCounter + 1;
+                        break;
+                case 1:
+                    // Chão bordas
+                    NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockBorder.png");
+                    break;
+                case 2:
+                    // Chão interno
+                    NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockInternal.png");
+                        break;
+                case 16:
+                {
+                    mCat = new Cat(this, "Player" + std::to_string(objNum));
+                    const Vector2 pos(posX, posY-1);
+                    mCat->SetPosition(pos);
+                    break;
+                }
+                case 10:
+                {
+                    auto *spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
+                    const Vector2 pos(posX, posY);
+                    spawner->SetPosition(pos);
+                    break;
+                }
+                default:
+                    break;
             }
             if (NewBlock)
             {
@@ -262,8 +372,44 @@ void Game::RunLoop()
     }
 }
 
+void Game::InitializeCore()
+{
+    mObjManager = new ObjectManager(this);
+    mTerminal = new Terminal(mRenderer);
+    mDialogManager = new DialogManager(mTerminal);
+}
+
+void Game::UnloadMenu()
+{
+    if (!mMainMenu)
+        return;
+
+    if (mAudio && mMainMenu->mMenuMusicPlaying)
+    {
+        mAudio->StopSound("MainMenu/Jazz.mp3");
+        mMainMenu->mMenuMusicPlaying = false;
+    }
+    if (mAudio)
+    {
+        mAudio->PlaySound("MainMenu/Meow.mp3", false);
+        mAudio->SetVolume("MainMenu/Meow.mp3", 10);
+    }
+
+    if (mAudio)
+    {
+        mAudio->PlaySound("Levels/BackgroundMusic.wav", true);
+        mAudio->SetVolume("Levels/BackgroundMusic.wav", 48);
+    }
+
+    delete mMainMenu;
+    mMainMenu = nullptr;
+}
+
 void Game::ProcessInput()
 {
+    if (mIsFading)
+        return;
+
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -273,29 +419,22 @@ void Game::ProcessInput()
             Quit();
             break;
         }
-        // no menu principal, apenas processa eventos normais
-        // para evitar de "abrir o terminal"
-        if (mCurrentScene != GameScene::MainMenu)
-        {
-            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-            {
-                mTerminal->Toggle();
-                continue;
-            }
-
-            // Terminal captura eventos so na gameplay
-            mTerminal->ProcessEvent(event);
-        }
-        else if (mMainMenu)
+        if (mMainMenu)
         {
             mMainMenu->HandleEvent(event);
+            return;
         }
+
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+        {
+            mTerminal->Toggle();
+            continue;
+        }
+        mTerminal->ProcessEvent(event);
     }
 
     if (mCurrentScene == GameScene::MainMenu)
-    {
         return;
-    }
 
     if (mTerminal->IsActive())
         return;
@@ -307,22 +446,69 @@ void Game::ProcessInput()
     }
 }
 
+void Game::GoToNextScene()
+{
+    switch (mCurrentScene)
+    {
+        case GameScene::Level1:
+        {
+            SetScene(GameScene::Level2);
+            break;
+        }
+        case GameScene::Level2:
+        {
+            SetScene(GameScene::Level3);
+            break;
+        }
+        case GameScene::Level3:
+        {
+            SetScene(GameScene::Level4);
+            break;
+        }
+        case GameScene::Level4:
+        {
+            SetScene(GameScene::Level5);
+            break;
+        }
+        case GameScene::Level5:
+        {
+            SetScene(GameScene::MainMenu);
+            break;
+        }
+        default:
+            SetScene(GameScene::Level1);
+            break;
+    }
+}
+
 void Game::UpdateGame(float deltaTime)
 {
-    if (mCurrentScene == GameScene::MainMenu)
+    if (mIsFading)
     {
-        if (mAudio)
-            mAudio->Update();
-        return; // não atualiza nada no menu principal
+        Fade(deltaTime);
+
+        // Update camera position
+        UpdateCamera();
+        return;
     }
+
+    if (mAudio)
+        mAudio->Update();
+
+    if (mCurrentScene == GameScene::MainMenu)
+        return;
+
+    if (mLevelChangeCondition())
+    {
+        GoToNextScene();
+        return;
+    }
+
     // Update all actors and pending actors
     UpdateActors(deltaTime);
 
     // Update camera position
     UpdateCamera();
-
-    if (mAudio)
-        mAudio->Update();
 
     std::string command = mTerminal->ConsumeCommand();
     if (!command.empty())
@@ -367,11 +553,8 @@ void Game::UpdateCamera()
     if (!mCat)
         return;
     float desiredXLoc = mCat->GetPosition().x - WINDOW_WIDTH / 2.f;
-
-    if (desiredXLoc < 0.f)
-        desiredXLoc = 0.f;
-
-    Vector2 clampedPos(desiredXLoc, GetCameraPos().y);
+    float desiredYLoc = mCat->GetPosition().y - WINDOW_HEIGHT/2.f;
+    Vector2 clampedPos(desiredXLoc, desiredYLoc);
 
     SetCameraPos(clampedPos);
 }

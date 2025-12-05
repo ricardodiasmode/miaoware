@@ -31,7 +31,10 @@ void MainMenu::HandleEvent(const SDL_Event& ev)
         }
         else if (k == SDLK_RETURN || k == SDLK_KP_ENTER)
         {
-            if (mSelected == 0) StartGame(); else mGame->Quit();
+            if (mSelected == 0)
+                mGame->SetScene(GameScene::Level1);
+            else
+                mGame->Quit();
         }
         else if (k == SDLK_q)
         {
@@ -49,7 +52,7 @@ void MainMenu::HandleEvent(const SDL_Event& ev)
         int my = ev.button.y;
         if (IsInStartRect(mx, my))
         {
-            StartGame();
+            mGame->SetScene(GameScene::Level1);
         }
         else if (IsInQuitRect(mx, my))
         {
@@ -125,27 +128,5 @@ void MainMenu::Draw(bool debug)
                 }
             }
         }
-    }
-}
-
-void MainMenu::StartGame()
-{
-    if (mGame->mAudio && mMenuMusicPlaying)
-    {
-        mGame->mAudio->StopSound("MainMenu/Jazz.mp3");
-        mMenuMusicPlaying = false;
-    }
-    if (mGame->mAudio)
-    {
-        mGame->mAudio->PlaySound("MainMenu/Meow.mp3", false);
-        mGame->mAudio->SetVolume("MainMenu/Meow.mp3", 10);
-    }
-    mGame->InitializeActors();
-    mGame->mCurrentScene = Game::GameScene::Playing;
-
-    if (mGame->mAudio)
-    {
-        mGame->mAudio->PlaySound("Levels/BackgroundMusic.wav", true);
-        mGame->mAudio->SetVolume("Levels/BackgroundMusic.wav", 48);
     }
 }

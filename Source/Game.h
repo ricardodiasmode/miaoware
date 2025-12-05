@@ -11,6 +11,17 @@
 #include <vector>
 #include "Renderer/Renderer.h"
 #include <algorithm>
+#include <functional>
+
+enum class GameScene
+{
+    MainMenu,
+    Level1,
+    Level2,
+    Level3,
+    Level4,
+    Level5
+};
 
 class Dog;
 
@@ -32,6 +43,10 @@ public:
 
     // Renderer
     class Renderer *GetRenderer() { return mRenderer; }
+
+    // Scene Handling
+    void SetScene(GameScene scene);
+    void UnloadScene();
 
     static const int WINDOW_WIDTH = 1200;
     static const int WINDOW_HEIGHT = 720;
@@ -61,16 +76,8 @@ public:
 
     std::vector<Actor *> GetAllActors() const { return mActors; }
 
-    enum class GameScene
-    {
-        MainMenu,
-        Playing
-    };
-
-    void SetScene(GameScene nextScene);
-    void UnloadScene();
-    
     GameScene mCurrentScene = GameScene::MainMenu;
+
     class Font* mUiFont = nullptr;
     class AudioSystem* mAudio = nullptr;
     class MainMenu* mMainMenu = nullptr;
@@ -84,7 +91,14 @@ public:
     int GetDogNum() const { return static_cast<int>(mDogs.size()); }
 
 private:
+    void InitializeCore();
+
+    void UnloadMenu();
+
     void ProcessInput();
+
+    void GoToNextScene();
+
     void UpdateGame(float deltaTime);
     void UpdateCamera();
     void GenerateOutput();
@@ -97,6 +111,12 @@ private:
     bool ValidateNumber(const std::string & string);
 
     void ProcessTerminalCommand(const std::string &input);
+
+    void SetConditionForLevelChange(std::function<bool()> Condition)
+    {
+        mLevelChangeCondition = std::move(Condition);
+    }
+    std::function<bool()> mLevelChangeCondition;
 
     // All the actors in the game
     std::vector<class Actor *> mActors;
@@ -131,4 +151,15 @@ private:
     class ObjectManager *mObjManager = nullptr;
     class Terminal *mTerminal;
     class DialogManager *mDialogManager = nullptr;
+
+
+    // fade
+    bool mIsFadeIn = false;
+    bool mIsFading = false;
+    std::function<void()> mFadeCallback;
+    void Fade(const float deltaTime);
+    void StartFade(const std::function<void()>& fadeCallback);
+
+public:
+    float mFadeValue = 0.f;
 };

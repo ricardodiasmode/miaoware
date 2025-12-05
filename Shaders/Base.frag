@@ -21,10 +21,15 @@ uniform float uTextureFactor;
 
 // Tex coord input from vertex shader
 in vec2 fragTexCoord;
+uniform float fade;         // 0 = fully visible, 1 = fully black
 
 void main()
 {
     vec4 texColor = texture(uTexture, fragTexCoord);
 
-    outColor = mix(vec4(uColor, 1.0), texColor, uTextureFactor);
+    // Base blended color (same logic as before)
+    vec4 baseColor = mix(vec4(uColor, 1.0), texColor, uTextureFactor);
+
+    // Apply fade: mix between baseColor and black
+    outColor = mix(baseColor, vec4(0.0, 0.0, 0.0, 1.0), fade);
 }

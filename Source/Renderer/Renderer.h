@@ -7,6 +7,8 @@
 #include "VertexArray.h"
 #include "Texture.h"
 
+class Game;
+
 enum class RendererMode
 {
     TRIANGLES,
@@ -16,7 +18,7 @@ enum class RendererMode
 class Renderer
 {
 public:
-	Renderer(SDL_Window* window);
+	Renderer(SDL_Window* window, Game* game);
 	~Renderer();
 
 	bool Initialize(float width, float height);

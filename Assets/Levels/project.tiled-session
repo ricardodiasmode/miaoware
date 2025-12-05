@@ -1,0 +1,43 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Level1-3/level1-3.tmx",
+    "expandedProjectPaths": [
+        ".",
+        "Level1-3"
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "C:/Users/ricar/Desktop/tp3-super-mario-bros-1-1-HectorSoares/Assets/Levels/Level1-1/level1-1.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "Level1-3/level1-3.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 301.99999999999994,
+                "y": 305.33333333333337
+            }
+        },
+        "blocks.tsx": {
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/ricar/Desktop/miaoware/Assets/Levels/Level2",
+    "last.imagePath": "C:/Users/ricar/Desktop/miaoware/Assets/Levels",
+    "map.height": 120,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.width": 15,
+    "openFiles": [
+        "Level1-3/level1-3.tmx"
+    ],
+    "project": "project.tiled-project",
+    "recentFiles": [
+        "Level1-3/level1-3.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}

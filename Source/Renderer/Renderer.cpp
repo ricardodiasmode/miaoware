@@ -3,12 +3,14 @@
 #include "Shader.h"
 #include "VertexArray.h"
 #include "Texture.h"
+#include "../Game.h"
 
-Renderer::Renderer(SDL_Window *window)
+Renderer::Renderer(SDL_Window *window, Game* game)
 : mBaseShader(nullptr)
 , mWindow(window)
 , mContext(nullptr)
 , mOrthoProjection(Matrix4::Identity)
+, mGame(game)
 {
 
 }
@@ -103,6 +105,7 @@ void Renderer::Draw(RendererMode mode, const Matrix4 &modelMatrix, const Vector2
     mBaseShader->SetVectorUniform("uColor", color);
     mBaseShader->SetVectorUniform("uTexRect", textureRect);
     mBaseShader->SetVectorUniform("uCameraPos", cameraPos);
+    glUniform1f(glGetUniformLocation(mBaseShader->GetProgram(), "fade"), mGame->mFadeValue);
 
     if(vertices)
     {

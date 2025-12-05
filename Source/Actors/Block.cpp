@@ -5,6 +5,7 @@
 #include "Block.h"
 #include "../Game.h"
 #include "../Components/Drawing/AnimatorComponent.h"
+#include "../Components/Drawing/TextComponent.h"
 #include "../Components/Physics/AABBColliderComponent.h"
 
 Block::Block(Game* game, const std::string& uniqueName, const std::string &texturePath, const bool isStatic, const bool isManageable)
@@ -25,4 +26,10 @@ Block::Block(Game* game, const std::string& uniqueName, const std::string &textu
                 Game::TILE_SIZE,
                 ColliderLayer::Blocks,
                 isStatic);
+
+        if (isManageable)
+        {
+                static constexpr Vector3 textColor(1, 1, 1);
+                new TextComponent(this, uniqueName.substr(5), textColor, 32);
+        }
 }

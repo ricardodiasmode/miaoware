@@ -25,6 +25,8 @@ public:
     void SetFloatUniform(const char* name, float value) const;
     void SetIntegerUniform(const char *name, int value) const;
 
+	[[nodiscard]] GLuint GetProgram() const { return mShaderProgram; }
+
 private:
 	// Tries to compile the specified shader
 	bool CompileShader(const std::string& fileName, GLenum shaderType, GLuint& outShader);

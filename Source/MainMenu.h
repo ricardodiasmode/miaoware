@@ -13,15 +13,15 @@ public:
     void HandleEvent(const SDL_Event& ev);
     void Draw(bool debug);
 
+    bool mMenuMusicPlaying = false;
+
 private:
-    void StartGame();
     bool IsInStartRect(int x, int y) const;
     bool IsInQuitRect(int x, int y) const;
 
     Game* mGame;
     Font* mFont;
     int mSelected = 0; // 0 = Start, 1 = Exit
-     bool mMenuMusicPlaying = false;
 
     const float mMinX = 446.0f;
     const float mMaxX = 558.0f;
