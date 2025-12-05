@@ -158,6 +158,7 @@ void Game::SetScene(GameScene nextScene)
 
                 mDialogManager->PlayDialog(DialogKeys::FASE1);
 
+                // todo: condition for level change
                 SetConditionForLevelChange([this]
                 {
                     if (mCat)
@@ -177,6 +178,13 @@ void Game::SetScene(GameScene nextScene)
                 InitializeCore();
 
                 mDialogManager->PlayDialog(DialogKeys::FASE2);
+
+                SetConditionForLevelChange([this]
+                {
+                    if (mCat)
+                        return mCat->GetPosition().x > TILE_SIZE*15;
+                    return false;
+                });
             });
             break;
         }
@@ -191,6 +199,14 @@ void Game::SetScene(GameScene nextScene)
                 InitializeCore();
 
                 mDialogManager->PlayDialog(DialogKeys::FASE3);
+
+                // todo: condition for level change
+                SetConditionForLevelChange([this]
+                {
+                    if (mCat)
+                        return mCat->GetPosition().x > TILE_SIZE*15;
+                    return false;
+                });
             });
             break;
         }
@@ -205,6 +221,14 @@ void Game::SetScene(GameScene nextScene)
                 InitializeCore();
 
                 mDialogManager->PlayDialog(DialogKeys::FASE4);
+
+                // todo: condition for level change
+                SetConditionForLevelChange([this]
+                {
+                    if (mCat)
+                        return mCat->GetPosition().x > TILE_SIZE*15;
+                    return false;
+                });
             });
             break;
         }
@@ -219,6 +243,14 @@ void Game::SetScene(GameScene nextScene)
                 InitializeCore();
 
                 mDialogManager->PlayDialog(DialogKeys::FASE5);
+
+                // todo: condition for level change
+                SetConditionForLevelChange([this]
+                {
+                    if (mCat)
+                        return mCat->GetPosition().x > TILE_SIZE*15;
+                    return false;
+                });
             });
             break;
         }
