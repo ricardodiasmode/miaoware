@@ -37,6 +37,7 @@ private:
   void Backspace();
   void SubmitLine();
   void DrawHelper(float left, float top, float width);
+  std::vector<std::string> WrapText(const std::string& text, float maxPixels);
 
   Renderer *mRenderer;
   Font *mFont;

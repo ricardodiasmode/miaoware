@@ -117,8 +117,8 @@ void Cat::OnUpdate(float deltaTime)
     }
     if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
     {
-        if (!mIsDead)
-            Kill();
+        // if (!mIsDead)
+        //     Kill();
     }
 
     if (mRigidBodyComponent->GetVelocity().y != 0)
