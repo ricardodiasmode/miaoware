@@ -48,15 +48,18 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
 
 void Cat::Jump()
 {
-    Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
-    newVelocity.y = mJumpSpeed;
-    mRigidBodyComponent->SetVelocity(newVelocity);
+    if (mCanJump) {
+        Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
+        newVelocity.y = mJumpSpeed;
+        mRigidBodyComponent->SetVelocity(newVelocity);
 
-    if (mGame && mGame->mAudio)
-    {
-        mGame->mAudio->PlaySound("Cat/Jump.wav", false);
-        mGame->mAudio->SetVolume("Cat/Jump.wav", 96);
+        if (mGame && mGame->mAudio)
+        {
+            mGame->mAudio->PlaySound("Cat/Jump.wav", false);
+            mGame->mAudio->SetVolume("Cat/Jump.wav", 96);
+        }
     }
+    mCanJump = false;
 }
 
 void Cat::OnProcessInput(const uint8_t* state)
@@ -115,13 +118,13 @@ void Cat::OnUpdate(float deltaTime)
         Vector2 posToSet(0.f, GetPosition().y);
         SetPosition(posToSet);
     }
-    if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
+    if (GetPosition().y > 45*Game::TILE_SIZE)
     {
-        // if (!mIsDead)
-        //     Kill();
+        if (!mIsDead)
+            Kill();
     }
 
-    if (mRigidBodyComponent->GetVelocity().y != 0)
+    if (mRigidBodyComponent->GetVelocity().y != 0 )
         mIsOnGround = false;
 
     ManageAnimations();
@@ -206,6 +209,8 @@ void Cat::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* o
     } else if (mAutoWalk){
         ReverseDirection();
     }
+
+    mCanJump = true;
 }
 
 void Cat::OnVerticalCollision(const float minOverlap, AABBColliderComponent* other)
@@ -226,6 +231,13 @@ void Cat::OnVerticalCollision(const float minOverlap, AABBColliderComponent* oth
     {
         dynamic_cast<MovingBlock*>(other->GetOwner())->StartMovementInterp();
     }
+
+    if (minOverlap < 0)
+    {
+        mCanJump = true;
+    }
+
+
 }
 
 void Cat::ReverseDirection()

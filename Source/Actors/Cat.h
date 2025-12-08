@@ -37,6 +37,7 @@ private:
     bool mWalkingSfxPlaying = false;
 
     int mDirection;
+    int mCanJump = true;
     bool mAutoWalk;
 
     class RigidBodyComponent* mRigidBodyComponent;
