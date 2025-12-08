@@ -32,6 +32,7 @@
 #include "Renderer/Font.h"
 #include "AudioSystem.h"
 #include "MainMenu.h"
+#include "Actors/Dog.h"
 
 Game::Game()
     : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr), mCurrentScene(GameScene::MainMenu), mUiFont(nullptr), mAudio(nullptr)
@@ -193,8 +194,8 @@ void Game::SetScene(GameScene nextScene)
             StartFade([this]
             {
                 // Todo: initialize Level3
-                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
-                BuildLevel(level, 15, 45);
+                int **level = LoadLevel("../Assets/Levels/Level3/level3.csv", 45, 15);
+                BuildLevel(level, 45, 15);
 
                 InitializeCore();
 
@@ -204,7 +205,7 @@ void Game::SetScene(GameScene nextScene)
                 SetConditionForLevelChange([this]
                 {
                     if (mCat)
-                        return mCat->GetPosition().x > TILE_SIZE*15;
+                        return mCat->GetPosition().x > TILE_SIZE*45;
                     return false;
                 });
             });
@@ -351,6 +352,13 @@ void Game::BuildLevel(int **levelData, int width, int height)
                     // Chão interno
                     NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockInternal.png");
                         break;
+                case 15:
+                {
+                    Dog *dog = new Dog(this, "Dog");
+                    const Vector2 pos(posX, posY-1);
+                    dog->SetPosition(pos);
+                    break;
+                }
                 case 16:
                 {
                     mCat = new Cat(this, "Player" + std::to_string(objNum));
@@ -457,11 +465,6 @@ void Game::ProcessInput()
             return;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-        {
-            mTerminal->Toggle();
-            continue;
-        }
         mTerminal->ProcessEvent(event);
     }
 
@@ -830,4 +833,9 @@ bool Game::ValidateVector2(const std::string &value)
     };
 
     return isNumber(x) && isNumber(y);
+}
+
+void Game::RestartLevel()
+{
+    //SetScene(mCurrentScene);
 }

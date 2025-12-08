@@ -38,7 +38,7 @@ Dog::Dog(Game* game, const std::string& uniqueName, float forwardSpeed, float de
                 Game::TILE_SIZE,
                 Game::TILE_SIZE,
                 ColliderLayer::Enemy);
-        mColliderComponent->SetEnabled(false);
+        mColliderComponent->SetEnabled(true);
 
         game->AddDog(this);
 }

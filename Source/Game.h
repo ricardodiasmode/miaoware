@@ -90,6 +90,8 @@ public:
     }
     int GetDogNum() const { return static_cast<int>(mDogs.size()); }
 
+    void RestartLevel();
+
 private:
     void InitializeCore();
 
@@ -116,6 +118,8 @@ private:
     {
         mLevelChangeCondition = std::move(Condition);
     }
+
+
     std::function<bool()> mLevelChangeCondition;
 
     // All the actors in the game

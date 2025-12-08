@@ -117,8 +117,8 @@ void Cat::OnUpdate(float deltaTime)
     }
     if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
     {
-        // if (!mIsDead)
-        //     Kill();
+        if (!mIsDead)
+            Kill();
     }
 
     if (mRigidBodyComponent->GetVelocity().y != 0)
@@ -188,6 +188,9 @@ void Cat::Kill()
         mGame->mAudio->PlaySound("MainMenu/Screaming.wav", false);
         mGame->mAudio->SetVolume("MainMenu/Screaming.wav", 96);
     }
+
+    if (mGame)
+        mGame->RestartLevel();
 }
 
 void Cat::EnemyHit(AABBColliderComponent *other)

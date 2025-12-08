@@ -90,12 +90,13 @@ void ObjectManager::SetAttributeValue(const std::string &objName, const std::str
         float camRight = camLeft + Game::WINDOW_WIDTH;
         float camBottom = camTop + Game::WINDOW_HEIGHT;
 
-        if (x < camLeft || x > camRight || y < camTop || y > camBottom)
-        {
-            mGame->GetTerminal()->AddLine("Error: Requested position is outside camera bounds.");
-            SDL_Log("ObjectManager: requested position (%d,%d) is outside camera bounds; change ignored", x, y);
-            return;
-        }
+        // if (x < camLeft || x > camRight || y < camTop || y > camBottom)
+        // {
+        //     mGame->GetTerminal()->AddLine("Error: Requested position is outside camera bounds.");
+        //     SDL_Log("ObjectManager: requested position (%d,%d) is outside camera bounds; change ignored", x, y);
+        //     SDL_Log("camLeft: %d camRight: %d camTop: %d camBottom: %d", camLeft, camRight,camTop, camBottom);
+        //     return;
+        // }
 
         const Vector2 newPos(static_cast<float>(x), static_cast<float>(y));
         SDL_Log("setting obj position to: %d, %d", x, y);

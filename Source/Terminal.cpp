@@ -10,7 +10,7 @@
 
 Terminal::Terminal(Renderer *renderer, const std::string &fontPath, int pointSize, int maxLines)
     : mRenderer(renderer), mFont(nullptr), mFontPath(fontPath), mPointSize(pointSize), mMaxLines(maxLines),
-      mActive(false), mCursorBlink(0.0f), mCursorOn(true) {
+      mActive(true), mCursorBlink(0.0f), mCursorOn(true) {
     // Cria e carrega a Font (aloca dinamicamente para compatibilidade)
     mFont = new Font();
     if (!mFont->Load(mFontPath)) {
