@@ -186,14 +186,9 @@ void Cat::Kill()
 
     if (mGame && mGame->mAudio)
     {
-        mGame->mAudio->StopSound("Levels/BackgroundMusic.wav");
-        mGame->mAudio->StopSound("Cat/Walking.wav");
         mGame->mAudio->PlaySound("MainMenu/Screaming.wav", false);
         mGame->mAudio->SetVolume("MainMenu/Screaming.wav", 96);
     }
-
-    if (mGame)
-        mGame->RestartLevel();
 }
 
 void Cat::EnemyHit(AABBColliderComponent *other)

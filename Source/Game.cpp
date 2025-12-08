@@ -539,6 +539,11 @@ void Game::UpdateGame(float deltaTime)
         return;
     }
 
+    if (mCat->IsCatDead()) {
+        RestartLevel();
+        return;
+    }
+
     // Update all actors and pending actors
     UpdateActors(deltaTime);
 
@@ -837,5 +842,5 @@ bool Game::ValidateVector2(const std::string &value)
 
 void Game::RestartLevel()
 {
-    //SetScene(mCurrentScene);
+    SetScene(mCurrentScene);
 }

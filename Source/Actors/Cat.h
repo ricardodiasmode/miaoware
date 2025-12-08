@@ -23,6 +23,8 @@ public:
 
     void EnemyHit(AABBColliderComponent *other);
 
+    bool IsCatDead() {return mIsDead;};
+
 private:
 
     void DecreaseSize();
