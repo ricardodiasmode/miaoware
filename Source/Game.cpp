@@ -155,8 +155,8 @@ void Game::SetScene(GameScene nextScene)
         StartFade([this]
                   {
                 // Todo: initialize Level1
-                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
-                BuildLevel(level, 15, 45);
+                int **level = LoadLevel("../Assets/Levels/Level1/level1.csv", 45, 15);
+                BuildLevel(level, 45, 15);
 
                 InitializeCore();
 
@@ -166,7 +166,7 @@ void Game::SetScene(GameScene nextScene)
                 SetConditionForLevelChange([this]
                 {
                     if (mCat)
-                        return mCat->GetPosition().x > TILE_SIZE*15;
+                        return mCat->GetPosition().x > TILE_SIZE*45;
                     return false;
                 }); });
         break;
@@ -516,6 +516,7 @@ void Game::GoToNextScene()
 
 void Game::UpdateGame(float deltaTime)
 {
+    // SDL_Log("%f %f", mCameraPos.x, mCameraPos.y);
     if (mIsFading)
     {
         Fade(deltaTime);
@@ -531,6 +532,7 @@ void Game::UpdateGame(float deltaTime)
     if (mCurrentScene == GameScene::MainMenu)
         return;
 
+    SDL_Log("%f %f", mCat->GetPosition().x, mCat->GetPosition().y);
     if (mLevelChangeCondition())
     {
         GoToNextScene();
