@@ -28,6 +28,7 @@ Cat::Cat(Game* game, const std::string& uniqueName, const float forwardSpeed, co
         Game::TILE_SIZE,
         Game::TILE_SIZE);
     mDrawComponent->AddAnimation("idle", {0});
+    mDrawComponent->AddAnimation("dead", {0});
     mDrawComponent->AddAnimation("jump", {2,4,5,1,6,9,3,7});
     mDrawComponent->AddAnimation("run", {10,16,18,14,19,20,21,22}); // Select a smooth subset for looping
     mDrawComponent->SetAnimFPS(6.f); // base (jump speed)
@@ -145,6 +146,7 @@ void Cat::OnUpdate(float deltaTime)
             SDL_Log("[Cat] Stop walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
             mGame->mAudio->StopSound("Cat/Walking.wav");
             mWalkingSfxPlaying = false;
+            mState = ActorState::Destroy;
         }
     }
 }
