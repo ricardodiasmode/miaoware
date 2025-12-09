@@ -94,7 +94,8 @@ void Game::UnloadScene()
     UnloadMenu();
 
     // Use state so we can call this from withing an a actor update
-    for(auto *actor : mActors) {
+    for (auto *actor : mActors)
+    {
         actor->SetState(ActorState::Destroy);
     }
 
@@ -115,7 +116,7 @@ void Game::UnloadScene()
     }
 }
 
-void Game::StartFade(const std::function<void()>& fadeCallback)
+void Game::StartFade(const std::function<void()> &fadeCallback)
 {
     mFadeCallback = fadeCallback;
     mIsFading = true;
@@ -133,7 +134,8 @@ void Game::Fade(const float deltaTime)
         {
             mIsFadeIn = false;
             mFadeCallback();
-        } else
+        }
+        else
         {
             mIsFading = false;
         }
@@ -148,10 +150,10 @@ void Game::SetScene(GameScene nextScene)
 
     switch (nextScene)
     {
-        case GameScene::Level1:
-        {
-            StartFade([this]
-            {
+    case GameScene::Level1:
+    {
+        StartFade([this]
+                  {
                 // Todo: initialize Level1
                 int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
                 BuildLevel(level, 15, 45);
@@ -166,14 +168,13 @@ void Game::SetScene(GameScene nextScene)
                     if (mCat)
                         return mCat->GetPosition().x > TILE_SIZE*15;
                     return false;
-                });
-            });
-            break;
-        }
-        case GameScene::Level2:
-        {
-            StartFade([this]
-            {
+                }); });
+        break;
+    }
+    case GameScene::Level2:
+    {
+        StartFade([this]
+                  {
                 int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
                 BuildLevel(level, 15, 45);
 
@@ -186,14 +187,13 @@ void Game::SetScene(GameScene nextScene)
                     if (mCat)
                         return mCat->GetPosition().x > TILE_SIZE*15;
                     return false;
-                });
-            });
-            break;
-        }
-        case GameScene::Level3:
-        {
-            StartFade([this]
-            {
+                }); });
+        break;
+    }
+    case GameScene::Level3:
+    {
+        StartFade([this]
+                  {
                 // Todo: initialize Level3
                 int **level = LoadLevel("../Assets/Levels/Level3/level3.csv", 45, 15);
                 BuildLevel(level, 45, 15);
@@ -208,17 +208,16 @@ void Game::SetScene(GameScene nextScene)
                     if (mCat)
                         return mCat->GetPosition().x > TILE_SIZE*45;
                     return false;
-                });
-            });
-            break;
-        }
-        case GameScene::Level4:
-        {
-            StartFade([this]
-            {
+                }); });
+        break;
+    }
+    case GameScene::Level4:
+    {
+        StartFade([this]
+                  {
                 // Todo: initialize Level4
-                int **level = LoadLevel("../Assets/Levels/Level4/level4.csv", 15, 45);
-                BuildLevel(level, 15, 45);
+                int **level = LoadLevel("../Assets/Levels/Level4/level4.csv", 45, 15);
+                BuildLevel(level, 45, 15);
 
                 InitializeCore();
 
@@ -230,16 +229,15 @@ void Game::SetScene(GameScene nextScene)
                     if (mCat)
                         return mCat->GetPosition().x > TILE_SIZE*15;
                     return false;
-                });
-            });
-            break;
-        }
-        case GameScene::Level5:
-        {
-            StartFade([this]
-            {
+                }); });
+        break;
+    }
+    case GameScene::Level5:
+    {
+        StartFade([this]
+                  {
                 // Todo: initialize Level5
-                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                int **level = LoadLevel("../Assets/Levels/Level5/level5.csv", 15, 45);
                 BuildLevel(level, 15, 45);
 
                 InitializeCore();
@@ -252,12 +250,11 @@ void Game::SetScene(GameScene nextScene)
                     if (mCat)
                         return mCat->GetPosition().x > TILE_SIZE*15;
                     return false;
-                });
-            });
-            break;
-        }
-        default:
-            break;
+                }); });
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -340,42 +337,42 @@ void Game::BuildLevel(int **levelData, int width, int height)
             // Instancia objetos baseado no ID do tile
             switch (tileID)
             {
-                case 0:
-                    // bloco manageable
-                    NewBlock = new Block(this, "Block" + std::to_string(managebleCounter), "../Assets/Sprites/Blocks/BlockJ.png", true, true);
-                    managebleCounter = managebleCounter + 1;
-                        break;
-                case 1:
-                    // Chão bordas
-                    NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockBorder.png");
-                    break;
-                case 2:
-                    // Chão interno
-                    NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockInternal.png");
-                        break;
-                case 3:
-                {
-                    Dog *dog = new Dog(this, "Dog");
-                    const Vector2 pos(posX, posY-1);
-                    dog->SetPosition(pos);
-                    break;
-                }
-                case 16:
-                {
-                    mCat = new Cat(this, "Player" + std::to_string(objNum));
-                    const Vector2 pos(posX, posY-1);
-                    mCat->SetPosition(pos);
-                    break;
-                }
-                case 10:
-                {
-                    auto *spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
-                    const Vector2 pos(posX, posY);
-                    spawner->SetPosition(pos);
-                    break;
-                }
-                default:
-                    break;
+            case 0:
+                // bloco manageable
+                NewBlock = new Block(this, "Block" + std::to_string(managebleCounter), "../Assets/Sprites/Blocks/BlockJ.png", true, true);
+                managebleCounter = managebleCounter + 1;
+                break;
+            case 1:
+                // Chão bordas
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockBorder.png");
+                break;
+            case 2:
+                // Chão interno
+                NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockInternal.png");
+                break;
+            case 3:
+            {
+                Dog *dog = new Dog(this, "Dog");
+                const Vector2 pos(posX, posY - 1);
+                dog->SetPosition(pos);
+                break;
+            }
+            case 16:
+            {
+                mCat = new Cat(this, "Player" + std::to_string(objNum));
+                const Vector2 pos(posX, posY - 1);
+                mCat->SetPosition(pos);
+                break;
+            }
+            case 10:
+            {
+                auto *spawner = new Spawner(this, "Spawner", SPAWN_DISTANCE);
+                const Vector2 pos(posX, posY);
+                spawner->SetPosition(pos);
+                break;
+            }
+            default:
+                break;
             }
             if (NewBlock)
             {
@@ -486,34 +483,34 @@ void Game::GoToNextScene()
 {
     switch (mCurrentScene)
     {
-        case GameScene::Level1:
-        {
-            SetScene(GameScene::Level2);
-            break;
-        }
-        case GameScene::Level2:
-        {
-            SetScene(GameScene::Level3);
-            break;
-        }
-        case GameScene::Level3:
-        {
-            SetScene(GameScene::Level4);
-            break;
-        }
-        case GameScene::Level4:
-        {
-            SetScene(GameScene::Level5);
-            break;
-        }
-        case GameScene::Level5:
-        {
-            SetScene(GameScene::MainMenu);
-            break;
-        }
-        default:
-            SetScene(GameScene::Level1);
-            break;
+    case GameScene::Level1:
+    {
+        SetScene(GameScene::Level2);
+        break;
+    }
+    case GameScene::Level2:
+    {
+        SetScene(GameScene::Level3);
+        break;
+    }
+    case GameScene::Level3:
+    {
+        SetScene(GameScene::Level4);
+        break;
+    }
+    case GameScene::Level4:
+    {
+        SetScene(GameScene::Level5);
+        break;
+    }
+    case GameScene::Level5:
+    {
+        SetScene(GameScene::MainMenu);
+        break;
+    }
+    default:
+        SetScene(GameScene::Level1);
+        break;
     }
 }
 
@@ -540,7 +537,8 @@ void Game::UpdateGame(float deltaTime)
         return;
     }
 
-    if (mCat->IsCatDead()) {
+    if (mCat->IsCatDead())
+    {
         RestartLevel();
         return;
     }
@@ -594,7 +592,7 @@ void Game::UpdateCamera()
     if (!mCat)
         return;
     float desiredXLoc = mCat->GetPosition().x - WINDOW_WIDTH / 2.f;
-    float desiredYLoc = mCat->GetPosition().y - WINDOW_HEIGHT/2.f;
+    float desiredYLoc = mCat->GetPosition().y - WINDOW_HEIGHT / 2.f;
     Vector2 clampedPos(desiredXLoc, desiredYLoc);
 
     SetCameraPos(clampedPos);
@@ -771,7 +769,7 @@ void Game::ProcessTerminalCommand(const std::string &input)
                     return;
                 }
             }
-            else if (MatchesCmd(arg2, "scale") || MatchesCmd(arg2,"position"))
+            else if (MatchesCmd(arg2, "scale") || MatchesCmd(arg2, "position"))
             {
                 if (!ValidateVector2(arg3))
                 {
