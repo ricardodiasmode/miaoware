@@ -227,7 +227,7 @@ void Game::SetScene(GameScene nextScene)
                 SetConditionForLevelChange([this]
                 {
                     if (mCat)
-                        return mCat->GetPosition().x > TILE_SIZE*15;
+                        return mCat->GetPosition().x > TILE_SIZE*45;
                     return false;
                 }); });
         break;

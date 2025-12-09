@@ -18,12 +18,12 @@ Dog::Dog(Game* game, const std::string& uniqueName, float forwardSpeed, float de
         , mDamageEnabled(true)
 {
         mDrawComponent = new AnimatorComponent(this,
-            "../Assets/Sprites/Goomba/Goomba.png",
-            "../Assets/Sprites/Goomba/Goomba.json",
+            "../Assets/Sprites/Dog/Dog.png",
+            "../Assets/Sprites/Dog/Dog.json",
             Game::TILE_SIZE,
             Game::TILE_SIZE);
 
-        mDrawComponent->AddAnimation("walk", {1, 2});
+        mDrawComponent->AddAnimation("walk", {1, 2, 3});
         mDrawComponent->AddAnimation("dead", {0});
         mDrawComponent->SetAnimation("walk");
         mDrawComponent->SetAnimFPS(10.f);
@@ -76,4 +76,6 @@ void Dog::OnHorizontalCollision(const float minOverlap, AABBColliderComponent* o
     Vector2 newVelocity = mRigidBodyComponent->GetVelocity();
     newVelocity.x = -newVelocity.x;
     mRigidBodyComponent->SetVelocity(newVelocity);
+    float direction = newVelocity.x < 0 ? -1.f : 1.f;
+    SetScale(Vector2((direction), 1.f));
 }
