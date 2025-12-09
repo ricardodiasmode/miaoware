@@ -216,7 +216,7 @@ void Game::SetScene(GameScene nextScene)
             StartFade([this]
             {
                 // Todo: initialize Level4
-                int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
+                int **level = LoadLevel("../Assets/Levels/Level4/level4.csv", 15, 45);
                 BuildLevel(level, 15, 45);
 
                 InitializeCore();
@@ -352,7 +352,7 @@ void Game::BuildLevel(int **levelData, int width, int height)
                     // Chão interno
                     NewBlock = new Block(this, "Block" + std::to_string(objNum), "../Assets/Sprites/Blocks/BlockInternal.png");
                         break;
-                case 15:
+                case 3:
                 {
                     Dog *dog = new Dog(this, "Dog");
                     const Vector2 pos(posX, posY-1);

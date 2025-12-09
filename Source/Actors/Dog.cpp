@@ -61,7 +61,7 @@ void Dog::OnUpdate(float deltaTime)
             mState = ActorState::Destroy;
     }
 
-    if (GetPosition().y > Game::LEVEL_HEIGHT*Game::TILE_SIZE)
+    if (GetPosition().y > 45*Game::TILE_SIZE)
         mState = ActorState::Destroy;
 }
 

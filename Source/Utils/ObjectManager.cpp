@@ -67,6 +67,14 @@ std::string ObjectManager::GetObjAttributes(const std::string &objName)
     return objLocation + "\n" + objRotation + "\n" + objScale;
 }
 
+static bool MatchesCmd(const std::string& input, const std::string& full)
+{
+    if (input == full) return true;
+    if (input.size() == 1 && full.size() > 1 && input[0] == full[0]) return true;
+    return false;
+}
+
+
 void ObjectManager::SetAttributeValue(const std::string &objName, const std::string &attributeName, const std::string &value)
 {
     Actor *actorToModify = GetActorByName(objName);
@@ -77,7 +85,7 @@ void ObjectManager::SetAttributeValue(const std::string &objName, const std::str
     }
 
     // For position, it is expected value to be in the format: (x, y)
-    if (attributeName == "position")
+    if (MatchesCmd(attributeName, "position"))
     {
         auto inner = value.substr(1, value.size() - 2);
         auto comma = inner.find(',');
@@ -104,13 +112,13 @@ void ObjectManager::SetAttributeValue(const std::string &objName, const std::str
         return;
     }
     // For rotation, it is expected value to be in the format: x
-    if (attributeName == "rotation")
+    if (MatchesCmd(attributeName, "rotation"))
     {
         actorToModify->SetRotation(value.at(0) - '0');
         return;
     }
     // For scale, it is expected value to be in the format: (x, y)
-    if (attributeName == "scale")
+    if (MatchesCmd(attributeName, "scale"))
     {
         auto inner = value.substr(1, value.size() - 2);
         auto comma = inner.find(',');

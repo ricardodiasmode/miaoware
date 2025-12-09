@@ -338,10 +338,10 @@ void Terminal::DrawHelper(float left, float top, float width)
             "  set <objName> <attr> <value>",
             "  list",
             "Attributes (attr):",
-            "  rotation     value: x            (float)",
-            "  position     value: (x,y)        (floats)",
-            "  scale        value: (x,y)        (floats)",
-            "  damage       value: x            (0,1)"};
+            "  rotation (r)     value: x            (float)",
+            "  position (p)    value: (x,y)        (floats)",
+            "  scale (s)       value: (x,y)        (floats)"
+        };
 
         float textX = px + 10.0f;
         float textY = py + 10.0f;
