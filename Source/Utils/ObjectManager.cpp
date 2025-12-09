@@ -12,6 +12,8 @@
 #include <vector>
 #include <algorithm>
 
+#include "TerminalHelper.h"
+
 ObjectManager::ObjectManager(Game *game) : mGame(game)
 {
 }
@@ -65,13 +67,6 @@ std::string ObjectManager::GetObjAttributes(const std::string &objName)
     // std::string objDamage = "damage: " + desiredActor->GetDamage();
 
     return objLocation + "\n" + objRotation + "\n" + objScale;
-}
-
-static bool MatchesCmd(const std::string& input, const std::string& full)
-{
-    if (input == full) return true;
-    if (input.size() == 1 && full.size() > 1 && input[0] == full[0]) return true;
-    return false;
 }
 
 

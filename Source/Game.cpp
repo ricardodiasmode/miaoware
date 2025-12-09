@@ -33,6 +33,7 @@
 #include "AudioSystem.h"
 #include "MainMenu.h"
 #include "Actors/Dog.h"
+#include "Utils/TerminalHelper.h"
 
 Game::Game()
     : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mIsDebugging(false), mUpdatingActors(false), mCameraPos(0.f, 0.f), mCat(nullptr), mLevelData(nullptr), mTerminal(nullptr), mCurrentScene(GameScene::MainMenu), mUiFont(nullptr), mAudio(nullptr)
@@ -770,7 +771,7 @@ void Game::ProcessTerminalCommand(const std::string &input)
                     return;
                 }
             }
-            else if (arg2 == "scale" || arg2 == "position")
+            else if (MatchesCmd(arg2, "scale") || MatchesCmd(arg2,"position"))
             {
                 if (!ValidateVector2(arg3))
                 {
@@ -802,6 +803,17 @@ void Game::ProcessTerminalCommand(const std::string &input)
             listStr += std::string(name) + " ";
         }
         mTerminal->AddLine(listStr);
+    }
+    else if (verb == "delete")
+    {
+        if (ss >> arg1)
+        {
+            mObjManager->DeleteObject(arg1);
+        }
+        else
+        {
+            mTerminal->AddLine("Usage: delete <Object Name>");
+        }
     }
     else
     {

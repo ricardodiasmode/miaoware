@@ -336,11 +336,12 @@ void Terminal::DrawHelper(float left, float top, float width)
             "  jump",
             "  get <objName>",
             "  set <objName> <attr> <value>",
+            "  delete <objName>",
             "  list",
             "Attributes (attr):",
             "  rotation (r)     value: x            (float)",
             "  position (p)    value: (x,y)        (floats)",
-            "  scale (s)       value: (x,y)        (floats)"
+            "  scale (s)       value: (x,y)        (floats)",
         };
 
         float textX = px + 10.0f;
