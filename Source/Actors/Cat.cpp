@@ -100,6 +100,7 @@ void Cat::OnProcessInput(const uint8_t* state)
 
 void Cat::OnUpdate(float deltaTime)
 {
+
     if (mAutoWalk && mRigidBodyComponent)
     {
         Vector2 vel = mRigidBodyComponent->GetVelocity();
@@ -146,7 +147,6 @@ void Cat::OnUpdate(float deltaTime)
             SDL_Log("[Cat] Stop walking SFX (running=%d, onGround=%d)", (int)mIsRunning, (int)mIsOnGround);
             mGame->mAudio->StopSound("Cat/Walking.wav");
             mWalkingSfxPlaying = false;
-            mState = ActorState::Destroy;
         }
     }
 }
