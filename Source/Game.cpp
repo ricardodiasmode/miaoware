@@ -173,6 +173,7 @@ void Game::SetScene(GameScene nextScene)
     }
     case GameScene::Level2:
     {
+
         StartFade([this]
                   {
                 int **level = LoadLevel("../Assets/Levels/Level2/level2.csv", 15, 45);
@@ -317,8 +318,8 @@ int **Game::LoadLevel(const std::string &fileName, int width, int height)
 
 void Game::BuildLevel(int **levelData, int width, int height)
 {
-    auto *bg = new Background(this, "Background", "../Assets/Sprites/Background.jpg");
-    bg->SetPosition(Vector2(3408, 210));
+    // auto *bg = new Background(this, "Background", "../Assets/Sprites/Background.jpg");
+    // bg->SetPosition(Vector2(3408, 210));
 
     // Percorre a matriz de tiles
     int objNum = 0;

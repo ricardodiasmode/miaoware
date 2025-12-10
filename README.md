@@ -17,7 +17,7 @@ O jogador possui controles simples: andar (esquerda/direita), pular e interagir 
 
 Condições de vitória: completar o nível atual (atingir o objetivo da fase) ou completar todas as fases designadas em uma sessão de playtest. Condições de derrota: morrer por colisão com inimigo sem ter power-up, cair fora dos limites do mapa ou perder todas as vidas (se implementado). Ao morrer, efeitos sonoros e transições visuais ocorrem e o jogador pode reiniciar a fase.
 
-![GAMEPLAY](https://www.youtube.com/watch?v=njX53r8li54)
+[GAMEPLAY](https://www.youtube.com/watch?v=njX53r8li54)
 
 **Funcionalidades a serem testadas**
 
